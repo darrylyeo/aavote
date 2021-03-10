@@ -1,3 +1,8 @@
+import { setEnvironment } from '$houdini'
+import env from './environment'
+setEnvironment(env)
+
+
 import sirv from 'sirv';
 import polka from 'polka';
 import compression from 'compression';

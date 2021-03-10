@@ -11,6 +11,8 @@ import typescript from '@rollup/plugin-typescript';
 import config from 'sapper/config/rollup.js';
 import pkg from './package.json';
 
+import houdini from 'houdini-preprocess'
+
 const mode = process.env.NODE_ENV;
 const dev = mode === 'development';
 const legacy = !!process.env.SAPPER_LEGACY_BUILD;
@@ -34,7 +36,10 @@ export default {
 				},
 			}),
 			svelte({
-				preprocess: sveltePreprocess({ sourceMap: dev }),
+				preprocess: [
+					sveltePreprocess({ sourceMap: dev }),
+					houdini()
+				],
 				compilerOptions: {
 					dev,
 					hydratable: true
@@ -89,7 +94,10 @@ export default {
 				},
 			}),
 			svelte({
-				preprocess: sveltePreprocess({ sourceMap: dev }),
+				preprocess: [
+					sveltePreprocess({ sourceMap: dev }),
+					houdini()
+				],
 				compilerOptions: {
 					dev,
 					generate: 'ssr',
