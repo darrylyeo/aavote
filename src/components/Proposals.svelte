@@ -3,7 +3,7 @@
 
 	const proposals = operationStore(`
         query AllProposals {
-			proposals(first: 100, order) {
+			proposals(first: 100, orderBy: createdTimestamp, orderDirection: desc) {
 				id
 				state
 				ipfsHash
