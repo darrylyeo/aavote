@@ -1,50 +1,20 @@
-<script>
-	import successkid from 'images/successkid.jpg';
+<script lang="ts">
+	import { initClient } from '@urql/svelte'
+
+	initClient({
+		url: 'https://api.thegraph.com/subgraphs/name/aave/governance-v2'
+	})
+
+	import Proposals from '../components/Proposals.svelte'
 </script>
 
 <style>
-	h1, figure, p {
-		text-align: center;
-		margin: 0 auto;
-	}
-
-	h1 {
-		font-size: 2.8em;
-		text-transform: uppercase;
-		font-weight: 700;
-		margin: 0 0 0.5em 0;
-	}
-
-	figure {
-		margin: 0 0 1em 0;
-	}
-
-	img {
-		width: 100%;
-		max-width: 400px;
-		margin: 0 0 1em 0;
-	}
-
-	p {
-		margin: 1em auto;
-	}
-
-	@media (min-width: 480px) {
-		h1 {
-			font-size: 4em;
-		}
-	}
 </style>
 
 <svelte:head>
-	<title>Sapper project template</title>
+	<title>Aavote – Governance Dashboard for Aave v2 Protocol</title>
 </svelte:head>
 
-<h1>Great success!</h1>
+<h1>Aavote</h1>
 
-<figure>
-	<img alt="Success Kid" src="{successkid}">
-	<figcaption>Have fun with Sapper!</figcaption>
-</figure>
-
-<p><strong>Try editing this file (src/routes/index.svelte) to test live reloading.</strong></p>
+<Proposals></Proposals>

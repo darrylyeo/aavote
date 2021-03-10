@@ -30,6 +30,8 @@
     "@types/compression": "^1.7.0",
     "@types/node": "^14.11.1",
     "@types/polka": "^0.5.1",
+    "@urql/svelte": "^1.2.0",
+    "graphql": "^15.5.0",
     "rollup": "^2.3.4",
     "rollup-plugin-svelte": "^7.0.0",
     "rollup-plugin-terser": "^7.0.0",
