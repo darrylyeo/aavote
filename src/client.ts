@@ -1,3 +1,5 @@
+import '@fontsource/varela-round'
+
 import * as sapper from '@sapper/app';
 
 sapper.start({

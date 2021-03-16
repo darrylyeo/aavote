@@ -44,6 +44,10 @@ export default {
 				sourceDir: path.resolve(__dirname, 'src/node_modules/images'),
 				publicPath: '/client/'
 			}),
+			url({
+				sourceDir: path.resolve(__dirname, 'node_modules/@fontsource/varela-round/files'),
+				publicPath: '/client/files'
+			}),
 			resolve({
 				browser: true,
 				dedupe: ['svelte']
@@ -101,6 +105,10 @@ export default {
 				sourceDir: path.resolve(__dirname, 'src/node_modules/images'),
 				publicPath: '/client/',
 				emitFiles: false // already emitted by client build
+			}),
+			url({
+				sourceDir: path.resolve(__dirname, 'node_modules/@fontsource/varela-round/files'),
+				publicPath: '/client/files'
 			}),
 			resolve({
 				dedupe: ['svelte']
