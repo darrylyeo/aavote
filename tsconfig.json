@@ -1,8 +1,0 @@
-{
-		"extends": "@tsconfig/svelte/tsconfig.json",
-		"compilerOptions": {
-			"lib": ["DOM", "ES2017", "WebWorker"]
-		},
-		"include": ["src/**/*", "src/node_modules/**/*", "node_modules/@fontsource"],
-		"exclude": ["__sapper__/*", "static/*"]
-	}
