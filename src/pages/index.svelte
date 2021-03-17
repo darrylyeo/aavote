@@ -1,8 +1,12 @@
-<script>
-    import RoutifyIntro from './example/_components/RoutifyIntro.svelte'
+<script lang="ts">
     import { metatags } from '@roxi/routify'
-    metatags.title = 'My Routify app'
-    metatags.description = 'Description coming soon...'
+    metatags.title = 'Aavote – Governance Dashboard for Aave v2 Protocol'
+	metatags.description = ''
+
+	import Proposals from '../components/Proposals.svelte'
 </script>
 
-<RoutifyIntro />
+
+<h1>Aavote</h1>
+
+<Proposals></Proposals>
