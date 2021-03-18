@@ -15,8 +15,50 @@
 		return `https://etherscan.io/address/${address}`
 	}
 
+	function formatPercent(number, maxDecimals = 2){
+		return new Intl.NumberFormat(globalThis.navigator.languages, {
+			minimumFractionDigits: maxDecimals,
+			maximumFractionDigits: maxDecimals
+		}).format(number * 100) + '%'
+	}
+	function formatVotingPower(number, maxDecimals = 3){
+		return new Intl.NumberFormat(globalThis.navigator.languages, {
+			minimumFractionDigits: maxDecimals,
+			maximumFractionDigits: maxDecimals
+		}).format(number / 1e18) + ' quintillion'
+	}
+
+
+	$: treemapData = {
+		name: 'AAVE Voting Power',
+		children: [
+			{
+				name: 'Yes',
+				children: proposal.votes.filter(vote => vote.support === true).map(vote => ({
+					name: vote.voter,
+					value: vote.votingPower,
+					support: vote.support
+				}))
+			},
+			{
+				name: 'No',
+				children: proposal.votes.filter(vote => vote.support === false).map(vote => ({
+					name: vote.voter,
+					value: vote.votingPower,
+					support: vote.support
+				}))
+			}
+		]
+	}
+	$: console.log(treemapData)
+
+	import { onMount } from 'svelte'
+	let isMounted = false
+	onMount(() => isMounted = true)
+
 
 	import Date from './Date.svelte'
+	import TreemapChart from './TreemapChart.svelte'
 </script>
 
 <style>
@@ -26,15 +68,15 @@
 	.proposal.state-pending,
 	.proposal.state-active,
 	.proposal.state-queued {
-		--state-color: rgb(222, 202, 89);
+		--state-color: var(--yellow);
 	}
 	.proposal.state-failed,
 	.proposal.state-canceled {
-		--state-color: rgb(222, 89, 89);
+		--state-color: var(--red);
 	}
 	.proposal.state-succeeded,
 	.proposal.state-executed {
-		--state-color: rgb(121, 201, 130);
+		--state-color: var(--green);
 	}
 
 	header {
@@ -128,10 +170,21 @@
 		<div>
 			<p>Yes: {proposal.currentYesVote}</p>
 			<p>No: {proposal.currentNoVote}</p>
-			<p>Total Voting Supply: {proposal.totalVotingSupply}</p>
-			<p>Total Proposition Supply: {proposal.totalPropositionSupply}</p>
+			<p>Total Voting Supply: {formatVotingPower(proposal.totalVotingSupply)}</p>
+			<p>Total Proposition Supply: {formatVotingPower(proposal.totalPropositionSupply)}</p>
 			<p>Addresses voted: {proposal.totalCurrentVoters}</p>
 		</div>
+		{#if treemapData && isMounted}
+			<TreemapChart data={treemapData}>
+				<div slot="contents" let:node style="--background-color: var(--{node.supports ? 'green' : 'red'})">
+					<h4>{node.data.name}</h4>
+					<span>{formatVotingPower(node.value)} ({formatPercent(node.value / node.parent.value)})</span>
+					{#if node.children}
+						<span>{node.children.length}</span>
+					{/if}
+				</div>
+			</TreemapChart>
+		{/if}
 	</div>
 
 	<p class="links">
