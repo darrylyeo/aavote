@@ -17,6 +17,8 @@
 		max-width: 56em;
 		padding: 2em;
 		margin: 0 auto;
+
+		mix-blend-mode: overlay;
 	}
 
 	header {
@@ -29,8 +31,6 @@
 	h1 {
 		font-size: 3.5em;
 		text-transform: uppercase;
-
-		mix-blend-mode: overlay;
 
 		color: rgba(255, 255, 255, 0.65);
 		text-shadow: 0 1px 3px, 0 3px 20px;
