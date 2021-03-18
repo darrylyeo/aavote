@@ -22,11 +22,6 @@
 <style>
 	.proposal {
 		display: grid;
-
-		background-color: rgba(255, 255, 255, 0.8);
-		border-radius: 1rem;
-		padding: 1.5rem;
-		mix-blend-mode: overlay;
 	}
 	.proposal.state-pending,
 	.proposal.state-active,
@@ -99,7 +94,7 @@
 	}
 </style>
 
-<article class="proposal state-{proposal.state.toLowerCase()}">
+<article class="proposal card state-{proposal.state.toLowerCase()}">
 	<header>
 		<span class="aip-number">
 			<span class="aip">AIP</span>
