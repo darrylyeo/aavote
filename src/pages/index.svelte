@@ -6,7 +6,4 @@
 	import Proposals from '../components/Proposals.svelte'
 </script>
 
-
-<h1>Aavote</h1>
-
 <Proposals></Proposals>

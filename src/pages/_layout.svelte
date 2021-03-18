@@ -18,9 +18,39 @@
 		padding: 2em;
 		margin: 0 auto;
 	}
+
+	header {
+		display: grid;
+		grid-template-columns: auto auto;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	h1 {
+		font-size: 3.5em;
+		text-transform: uppercase;
+
+		mix-blend-mode: overlay;
+
+		color: rgba(255, 255, 255, 0.65);
+		text-shadow: 0 1px 3px, 0 3px 20px;
+	}
+	@supports (-webkit-text-stroke: 1px) {
+		h1 {
+			color: rgba(255, 255, 255, 0.45);
+			-webkit-text-stroke: 0.02em rgba(255, 255, 255, 0.65);
+			text-shadow: 0 1px 3px, 0 3px 20px;
+		}
+	}
 </style>
 
 <main>
+	<header>
+		<h1>Aavote</h1>
+		<div>
+			<p>Aave governance dashboard</p>
+		</div>
+	</header>
 	<slot></slot>
 </main>
 
