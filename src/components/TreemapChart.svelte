@@ -8,11 +8,13 @@
 
 	export let data
 
-	const root = d3.treemap()(
-		d3.hierarchy(data)
-			.sum(d => d.value)
-			.sort((a, b) => b.value - a.value)
-	)
+	const root = d3.treemap()
+		// .tile(d3.treemapSquarify.ratio(9))
+		(
+			d3.hierarchy(data)
+				.sum(d => d.value)
+				.sort((a, b) => b.height - a.height || b.value - a.value)
+		)
 
 	let selected = root
 
@@ -21,7 +23,7 @@
 			node = node.parent
 		}
 
-		if (node && node.children) selected = node
+		if (node /*&& node.children*/) selected = node
 	}
 
 	const breadcrumbs = node => {
@@ -39,7 +41,7 @@
 		duration: 400
 	})
 
-	const isVisible = (a, b) => {
+	function isVisible(a, b){
 		while (b) {
 			if (a.parent === b) return true
 			b = b.parent
@@ -59,20 +61,23 @@
 <button class="breadcrumbs" disabled="{!selected.parent}" on:click="{() => selected = selected.parent}">
 	{breadcrumbs(selected)}
 </button>
+{#if selected && selected.data}
+	<slot name="node-contents" node={selected}></slot>
+{/if}
 
 <div class="chart">
 	<Chart x1={$extents.x1} x2={$extents.x2} y1={$extents.y1} y2={$extents.y2}>
 		<Treemap {root} let:node>
-			{#if isVisible(node, selected)}
+			<!-- {#if isVisible(node, selected)} -->
 				<div
-					transition:fade={{duration: 400}}
 					class="node"
 					class:leaf={!node.children}
+					class:is-visible={node.parent === selected || (node === selected && !node.children)}
 					on:click="{() => select(node)}"
 				>
 					<slot name="node-contents" {node}></slot>
 				</div>
-			{/if}
+			<!-- {/if} -->
 		</Treemap>
 	</Chart>
 </div>
@@ -80,7 +85,6 @@
 <style>
 	.breadcrumbs {
 		width: 100%;
-		padding: 0.3rem 0.4rem;
 		background-color: transparent;
 		font-family: inherit;
 		font-size: inherit;
@@ -116,5 +120,12 @@
 		width: 100%;
 		height: 100%;
 		box-sizing: border-box;
+
+		transition: 300ms;
+	}
+	.node:not(.is-visible) > :global(*) {
+		opacity: 0.1;
+		color: transparent;
+		pointer-events: none;
 	}
 </style>

@@ -15,27 +15,29 @@
 		return `https://etherscan.io/address/${address}`
 	}
 
-	function formatPercent(number, maxDecimals = 2){
+	function formatPercent(number, maxDecimals = 3){
 		return new Intl.NumberFormat(globalThis.navigator.languages, {
 			minimumFractionDigits: maxDecimals,
 			maximumFractionDigits: maxDecimals
 		}).format(number * 100) + '%'
 	}
-	function formatVotingPower(number, maxDecimals = 3){
+	function formatVotingPower(number, maxDecimals = 0){
 		return new Intl.NumberFormat(globalThis.navigator.languages, {
 			minimumFractionDigits: maxDecimals,
 			maximumFractionDigits: maxDecimals
-		}).format(number / 1e18) + ' quintillion'
+		}).format(number / 1e18)// + ' quintillion'
 	}
 
 
 	$: treemapData = {
 		name: 'AAVE Voting Power',
+		// value: Number(proposal.totalVotingSupply),
 		children: [
-			// {
-			// 	type: 'voted-not-voted',
-			// 	name: 'Voted',
-			// 	children: [
+			{
+				type: 'voted',
+				name: 'Voted',
+				value: Number(proposal.currentYesVote) + Number(proposal.currentNoVote),
+				children: [
 					{
 						type: 'vote-choice',
 						name: 'Yes',
@@ -56,22 +58,19 @@
 							support: vote.support
 						}))
 					}
-			//	]
-			// },
-			// {
-			// 	type: 'voted-not-voted',
-			// 	name: 'Not Voted',
-			// 	value: proposal.totalVotingSupply - proposal.currentYesVote - proposal.currentNoVote
-			// }
+				]
+			},
+			{
+				type: 'voted',
+				name: 'Didn\'t Vote',
+				value: Number(proposal.totalVotingSupply) - (Number(proposal.currentYesVote) + Number(proposal.currentNoVote))
+			}
 		]
 	}
 	$: console.log(treemapData)
 
-	import { onMount } from 'svelte'
-	let isMounted = false
-	onMount(() => isMounted = true)
 
-
+	import Address from './Address.svelte'
 	import Date from './Date.svelte'
 	import TreemapChart from './TreemapChart.svelte'
 </script>
@@ -153,15 +152,18 @@
 	.vote-node {
 		border: 2px solid transparent;
 		padding: 0.5rem;
-		color: white;
 		border-radius: 0.5em;
 		background-clip: padding-box;
+		font-size: 0.8em;
+		background-color: rgba(255, 255, 255, 0.5);
 	}
-	.vote-node.yes {
+	.vote-node.support-true {
 		background-color: var(--green);
+		color: white;
 	}
-	.vote-node.no {
+	.vote-node.support-false {
 		background-color: var(--red);
+		color: white;
 	}
 
 	.address {
@@ -208,16 +210,26 @@
 			<p>Total Proposition Supply: {formatVotingPower(proposal.totalPropositionSupply)}</p>
 			<p>Addresses voted: {proposal.totalCurrentVoters}</p>
 		</div>
-		{#if treemapData && isMounted}
+		{#if treemapData}
 			<TreemapChart data={treemapData}>
 				<div slot="node-contents" let:node
-					class="vote-node type-{node.data.type}"
-					class:yes={node.data.support} class:no={!node.data.support}
+					class="vote-node type-{node.data.type} support-{node.data.support}"
 				>
-					<h4>{node.data.name}</h4>
-					<span>{formatVotingPower(node.value)} ({formatPercent(node.value / node.parent.value)})</span>
-					{#if node.children}
-						<span>{node.children.length}</span>
+					{#if node.data.type === 'voted'}
+						<h4>{node.data.name}</h4>
+						<p>{formatVotingPower(node.value)} ({formatPercent(node.value / node.parent.value)})</p>
+						{#if node.children}
+							<p>{node.children.length} voter addresses</p>
+						{/if}
+					{:else if node.data.type === 'vote-choice'}
+						<h4>{node.data.name}</h4>
+						<p>{formatVotingPower(node.value)} ({formatPercent(node.value / node.parent.value)})</p>
+						{#if node.children}
+							<p>{node.children.length} voter addresses</p>
+						{/if}
+					{:else if node.data.type === 'vote'}
+						<p>{formatVotingPower(node.value)} ({formatPercent(node.value / node.parent.value)})</p>
+						<strong><Address address={node.data.name} /></strong>
 					{/if}
 				</div>
 			</TreemapChart>
