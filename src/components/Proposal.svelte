@@ -30,17 +30,18 @@
 
 
 	$: treemapData = {
-		name: 'AAVE Voting Power',
+		type: 'root',
+		name: 'Distribution of Voting Power',
 		// value: Number(proposal.totalVotingSupply),
 		children: [
 			{
 				type: 'voted',
-				name: 'Voted',
-				value: Number(proposal.currentYesVote) + Number(proposal.currentNoVote),
+				name: 'Votes',
+				// value: Number(proposal.currentYesVote) + Number(proposal.currentNoVote),
 				children: [
 					{
 						type: 'vote-choice',
-						name: 'Yes',
+						name: 'Yes Votes',
 						children: proposal.votes.filter(vote => vote.support === true).map(vote => ({
 							type: 'vote',
 							name: vote.voter,
@@ -50,7 +51,7 @@
 					},
 					{
 						type: 'vote-choice',
-						name: 'No',
+						name: 'No Votes',
 						children: proposal.votes.filter(vote => vote.support === false).map(vote => ({
 							type: 'vote',
 							name: vote.voter,
@@ -62,7 +63,7 @@
 			},
 			{
 				type: 'voted',
-				name: 'Didn\'t Vote',
+				name: 'Non-Votes',
 				value: Number(proposal.totalVotingSupply) - (Number(proposal.currentYesVote) + Number(proposal.currentNoVote))
 			}
 		]
@@ -166,9 +167,8 @@
 		color: white;
 	}
 
-	.address {
-		overflow: hidden;
-		text-overflow: ellipsis;
+	.vote-node abbr {
+		text-decoration: none;
 	}
 </style>
 
@@ -206,8 +206,8 @@
 		<div>
 			<p>Yes: {proposal.currentYesVote}</p>
 			<p>No: {proposal.currentNoVote}</p>
-			<p>Total Voting Supply: {formatVotingPower(proposal.totalVotingSupply)}</p>
-			<p>Total Proposition Supply: {formatVotingPower(proposal.totalPropositionSupply)}</p>
+			<p>Total Voting Supply: {formatVotingPower(proposal.totalVotingSupply)} <abbr title="Voting Power">VP</abbr></p>
+			<p>Total Proposition Supply: {formatVotingPower(proposal.totalPropositionSupply)} <abbr title="Voting Power">VP</abbr></p>
 			<p>Addresses voted: {proposal.totalCurrentVoters}</p>
 		</div>
 		{#if treemapData}
@@ -215,20 +215,23 @@
 				<div slot="node-contents" let:node
 					class="vote-node type-{node.data.type} support-{node.data.support}"
 				>
-					{#if node.data.type === 'voted'}
+					{#if node.data.type === 'root'}
 						<h4>{node.data.name}</h4>
-						<p>{formatVotingPower(node.value)} ({formatPercent(node.value / node.parent.value)})</p>
+						<p>Total Voting Supply: {formatVotingPower(node.value)} <abbr title="Voting Power">VP</abbr></p>
+					{:else if node.data.type === 'voted'}
+						<h4>{node.data.name}</h4>
+						<p>{formatVotingPower(node.value)} <abbr title="Voting Power">VP</abbr> ({formatPercent(node.value / node.parent.value)})</p>
 						{#if node.children}
-							<p>{node.children.length} voter addresses</p>
+							<p>{node.children.length} voters</p>
 						{/if}
 					{:else if node.data.type === 'vote-choice'}
 						<h4>{node.data.name}</h4>
-						<p>{formatVotingPower(node.value)} ({formatPercent(node.value / node.parent.value)})</p>
+						<p>{formatVotingPower(node.value)} <abbr title="Voting Power">VP</abbr> ({formatPercent(node.value / node.parent.value)})</p>
 						{#if node.children}
-							<p>{node.children.length} voter addresses</p>
+							<p>{node.children.length} voters</p>
 						{/if}
 					{:else if node.data.type === 'vote'}
-						<p>{formatVotingPower(node.value)} ({formatPercent(node.value / node.parent.value)})</p>
+						<p>{formatVotingPower(node.value)} <abbr title="Voting Power">VP</abbr> ({formatPercent(node.value / node.parent.value)})</p>
 						<strong><Address address={node.data.name} /></strong>
 					{/if}
 				</div>

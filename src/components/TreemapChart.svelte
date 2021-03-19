@@ -2,14 +2,13 @@
 	import * as d3 from 'd3-hierarchy'
 	import { tweened } from 'svelte/motion'
 	import * as eases from 'svelte/easing'
-	import { fade } from 'svelte/transition'
-	import Chart from './Chart.svelte'
-	import Treemap from './Treemap.svelte'
 
 	export let data
 
 	const root = d3.treemap()
-		// .tile(d3.treemapSquarify.ratio(9))
+		.tile(d3.treemapBinary)
+		// .tile(d3.treemapSquarify.ratio(3))
+		.size([1, 3])
 		(
 			d3.hierarchy(data)
 				.sum(d => d.value)
@@ -56,12 +55,15 @@
 		y1: selected.y1,
 		y2: selected.y0
 	}
+
+
+	import Chart from './Chart.svelte'
+	import Treemap from './Treemap.svelte'
+	import TreemapBreadcrumb from './TreemapBreadcrumb.svelte'
 </script>
 
-<button class="breadcrumbs" disabled="{!selected.parent}" on:click="{() => selected = selected.parent}">
-	{breadcrumbs(selected)}
-</button>
-{#if selected && selected.data}
+{#if selected}
+	<TreemapBreadcrumb bind:selected={selected} />
 	<slot name="node-contents" node={selected}></slot>
 {/if}
 
@@ -83,21 +85,6 @@
 </div>
 
 <style>
-	.breadcrumbs {
-		width: 100%;
-		background-color: transparent;
-		font-family: inherit;
-		font-size: inherit;
-		text-align: left;
-		border: none;
-		cursor: pointer;
-		outline: none;
-	}
-
-	.breadcrumbs:disabled {
-		cursor: default;
-	}
-
 	.chart {
 		width: 100%;
 		height: 400px;
