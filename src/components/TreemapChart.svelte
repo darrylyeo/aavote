@@ -1,4 +1,4 @@
-<script>
+<script type="ts">
 	import * as d3 from 'd3-hierarchy'
 	import { tweened } from 'svelte/motion'
 	import * as eases from 'svelte/easing'
@@ -8,12 +8,12 @@
 	const root = d3.treemap()
 		.tile(d3.treemapBinary)
 		// .tile(d3.treemapSquarify.ratio(3))
-		.size([1, 3])
-		(
-			d3.hierarchy(data)
-				.sum(d => d.value)
-				.sort((a, b) => b.height - a.height || b.value - a.value)
-		)
+		// .paddingTop(node => node.height / 100)
+		// .padding(5)
+		// .paddingInner(5)
+		// .size([100, 100])
+		// .round(1)
+		(data)
 
 	let selected = root
 
@@ -113,6 +113,6 @@
 	.node:not(.is-visible) > :global(*) {
 		opacity: 0.1;
 		color: transparent;
-		pointer-events: none;
+		/* pointer-events: none; */
 	}
 </style>

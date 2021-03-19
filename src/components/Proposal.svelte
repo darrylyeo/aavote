@@ -1,6 +1,66 @@
 <script lang="ts">
 	export let proposal
 
+	import * as d3 from 'd3-hierarchy'
+
+	const countProperties = ['votingPower', 'voters']
+	let currentCountProperty: 'votingPower' | 'voters' = 'votingPower'
+
+	$: treemapData = d3.hierarchy({
+		type: 'root',
+		name: 'Vote Distribution',
+		// value: Number(proposal.totalVotingSupply),
+		children: [
+			{
+				type: 'voted',
+				name: 'Votes',
+				// value: Number(proposal.currentYesVote) + Number(proposal.currentNoVote),
+				children: [
+					{
+						type: 'vote-choice',
+						name: 'Yes Votes',
+						children: proposal.votes.filter(vote => vote.support === true).map(vote => ({
+							type: 'vote',
+							name: vote.voter,
+							votingPower: vote.votingPower,
+							voters: 1,
+							support: vote.support
+						}))
+					},
+					{
+						type: 'vote-choice',
+						name: 'No Votes',
+						children: proposal.votes.filter(vote => vote.support === false).map(vote => ({
+							type: 'vote',
+							name: vote.voter,
+							votingPower: vote.votingPower,
+							voters: 1,
+							support: vote.support
+						}))
+					}
+				]
+			},
+			{
+				type: 'voted',
+				name: 'Non-Votes',
+				votingPower: Number(proposal.totalVotingSupply) - (Number(proposal.currentYesVote) + Number(proposal.currentNoVote))
+			}
+		]
+	})
+	.eachAfter(node => {
+		for(const countProperty of countProperties)
+			node.data[countProperty] = (node.children || []).reduce((sum, child) => sum + +child.data[countProperty], +node.data[countProperty] || 0)
+	})
+
+	// Set the official .value property from which the d3-hierarchy layout is derived
+	$: treemapData.eachAfter(node => {
+		node.value = node.data[currentCountProperty]
+	})
+		.sort((a, b) => b.height - a.height || b.value - a.value)
+
+	$: console.log(treemapData)
+
+
 	const regex = /^AIP (\d+):/
 	$: if(proposal.aipNumber == 0){
 		const match = proposal.title.match(regex)
@@ -27,48 +87,6 @@
 			maximumFractionDigits: maxDecimals
 		}).format(number / 1e18)// + ' quintillion'
 	}
-
-
-	$: treemapData = {
-		type: 'root',
-		name: 'Distribution of Voting Power',
-		// value: Number(proposal.totalVotingSupply),
-		children: [
-			{
-				type: 'voted',
-				name: 'Votes',
-				// value: Number(proposal.currentYesVote) + Number(proposal.currentNoVote),
-				children: [
-					{
-						type: 'vote-choice',
-						name: 'Yes Votes',
-						children: proposal.votes.filter(vote => vote.support === true).map(vote => ({
-							type: 'vote',
-							name: vote.voter,
-							value: vote.votingPower,
-							support: vote.support
-						}))
-					},
-					{
-						type: 'vote-choice',
-						name: 'No Votes',
-						children: proposal.votes.filter(vote => vote.support === false).map(vote => ({
-							type: 'vote',
-							name: vote.voter,
-							value: vote.votingPower,
-							support: vote.support
-						}))
-					}
-				]
-			},
-			{
-				type: 'voted',
-				name: 'Non-Votes',
-				value: Number(proposal.totalVotingSupply) - (Number(proposal.currentYesVote) + Number(proposal.currentNoVote))
-			}
-		]
-	}
-	$: console.log(treemapData)
 
 
 	import Address from './Address.svelte'
@@ -217,21 +235,17 @@
 				>
 					{#if node.data.type === 'root'}
 						<h4>{node.data.name}</h4>
-						<p>Total Voting Supply: {formatVotingPower(node.value)} <abbr title="Voting Power">VP</abbr></p>
+						<p>{formatVotingPower(node.data.votingPower)} <abbr title="Voting Power">VP</abbr></p>
 					{:else if node.data.type === 'voted'}
 						<h4>{node.data.name}</h4>
-						<p>{formatVotingPower(node.value)} <abbr title="Voting Power">VP</abbr> ({formatPercent(node.value / node.parent.value)})</p>
-						{#if node.children}
-							<p>{node.children.length} voters</p>
-						{/if}
+						<p>{formatVotingPower(node.data.votingPower)} <abbr title="Voting Power">VP</abbr> ({formatPercent(node.data.votingPower / node.parent.data.votingPower)})</p>
+						<p>{node.data.voters} voters</p>
 					{:else if node.data.type === 'vote-choice'}
 						<h4>{node.data.name}</h4>
-						<p>{formatVotingPower(node.value)} <abbr title="Voting Power">VP</abbr> ({formatPercent(node.value / node.parent.value)})</p>
-						{#if node.children}
-							<p>{node.children.length} voters</p>
-						{/if}
+						<p>{formatVotingPower(node.data.votingPower)} <abbr title="Voting Power">VP</abbr> ({formatPercent(node.data.votingPower / node.parent.data.votingPower)})</p>
+						<p>{node.data.voters} voters</p>
 					{:else if node.data.type === 'vote'}
-						<p>{formatVotingPower(node.value)} <abbr title="Voting Power">VP</abbr> ({formatPercent(node.value / node.parent.value)})</p>
+						<p>{formatVotingPower(node.data.votingPower)} <abbr title="Voting Power">VP</abbr> ({formatPercent(node.data.votingPower / node.parent.data.votingPower)})</p>
 						<strong><Address address={node.data.name} /></strong>
 					{/if}
 				</div>
