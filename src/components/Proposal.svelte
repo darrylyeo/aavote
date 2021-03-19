@@ -32,22 +32,37 @@
 	$: treemapData = {
 		name: 'AAVE Voting Power',
 		children: [
-			{
-				name: 'Yes',
-				children: proposal.votes.filter(vote => vote.support === true).map(vote => ({
-					name: vote.voter,
-					value: vote.votingPower,
-					support: vote.support
-				}))
-			},
-			{
-				name: 'No',
-				children: proposal.votes.filter(vote => vote.support === false).map(vote => ({
-					name: vote.voter,
-					value: vote.votingPower,
-					support: vote.support
-				}))
-			}
+			// {
+			// 	type: 'voted-not-voted',
+			// 	name: 'Voted',
+			// 	children: [
+					{
+						type: 'vote-choice',
+						name: 'Yes',
+						children: proposal.votes.filter(vote => vote.support === true).map(vote => ({
+							type: 'vote',
+							name: vote.voter,
+							value: vote.votingPower,
+							support: vote.support
+						}))
+					},
+					{
+						type: 'vote-choice',
+						name: 'No',
+						children: proposal.votes.filter(vote => vote.support === false).map(vote => ({
+							type: 'vote',
+							name: vote.voter,
+							value: vote.votingPower,
+							support: vote.support
+						}))
+					}
+			//	]
+			// },
+			// {
+			// 	type: 'voted-not-voted',
+			// 	name: 'Not Voted',
+			// 	value: proposal.totalVotingSupply - proposal.currentYesVote - proposal.currentNoVote
+			// }
 		]
 	}
 	$: console.log(treemapData)
@@ -134,6 +149,25 @@
 		font-size: 0.85em;
 		opacity: 0.6;
 	}
+
+	.vote-node {
+		border: 2px solid transparent;
+		padding: 0.5rem;
+		color: white;
+		border-radius: 0.5em;
+		background-clip: padding-box;
+	}
+	.vote-node.yes {
+		background-color: var(--green);
+	}
+	.vote-node.no {
+		background-color: var(--red);
+	}
+
+	.address {
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
 </style>
 
 <article class="proposal card state-{proposal.state.toLowerCase()}">
@@ -176,7 +210,10 @@
 		</div>
 		{#if treemapData && isMounted}
 			<TreemapChart data={treemapData}>
-				<div slot="contents" let:node style="--background-color: var(--{node.supports ? 'green' : 'red'})">
+				<div slot="node-contents" let:node
+					class="vote-node type-{node.data.type}"
+					class:yes={node.data.support} class:no={!node.data.support}
+				>
 					<h4>{node.data.name}</h4>
 					<span>{formatVotingPower(node.value)} ({formatPercent(node.value / node.parent.value)})</span>
 					{#if node.children}

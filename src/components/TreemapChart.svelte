@@ -1,14 +1,14 @@
 <script>
-	import * as Pancake from '@sveltejs/pancake'
 	import * as d3 from 'd3-hierarchy'
 	import { tweened } from 'svelte/motion'
 	import * as eases from 'svelte/easing'
 	import { fade } from 'svelte/transition'
+	import Chart from './Chart.svelte'
 	import Treemap from './Treemap.svelte'
 
 	export let data
 
-	const root = d3.treemap(
+	const root = d3.treemap()(
 		d3.hierarchy(data)
 			.sum(d => d.value)
 			.sort((a, b) => b.value - a.value)
@@ -21,7 +21,7 @@
 			node = node.parent
 		}
 
-		if (node /*&& node.children*/) selected = node
+		if (node && node.children) selected = node
 	}
 
 	const breadcrumbs = node => {
@@ -39,7 +39,7 @@
 		duration: 400
 	})
 
-	const is_visible = (a, b) => {
+	const isVisible = (a, b) => {
 		while (b) {
 			if (a.parent === b) return true
 			b = b.parent
@@ -56,25 +56,25 @@
 	}
 </script>
 
-<!-- <button class="breadcrumbs" disabled="{!selected.parent}" on:click="{() => selected = selected.parent}">
+<button class="breadcrumbs" disabled="{!selected.parent}" on:click="{() => selected = selected.parent}">
 	{breadcrumbs(selected)}
-</button> -->
+</button>
 
 <div class="chart">
-	<Pancake.Chart x1={$extents.x1} x2={$extents.x2} y1={$extents.y1} y2={$extents.y2}>
+	<Chart x1={$extents.x1} x2={$extents.x2} y1={$extents.y1} y2={$extents.y2}>
 		<Treemap {root} let:node>
-			{#if is_visible(node, selected)}
+			{#if isVisible(node, selected)}
 				<div
-					transition:fade={{duration:400}}
+					transition:fade={{duration: 400}}
 					class="node"
 					class:leaf={!node.children}
 					on:click="{() => select(node)}"
 				>
-					<slot {node}></slot>
+					<slot name="node-contents" {node}></slot>
 				</div>
 			{/if}
 		</Treemap>
-	</Pancake.Chart>
+	</Chart>
 </div>
 
 <style>
@@ -104,7 +104,6 @@
 		position: absolute;
 		width: 100%;
 		height: 100%;
-		background-color: white;
 		overflow: hidden;
 		pointer-events: all;
 	}
@@ -113,25 +112,9 @@
 		cursor: pointer;
 	}
 
-	.contents {
+	.node > :global(*) {
 		width: 100%;
 		height: 100%;
-		padding: 0.3rem 0.4rem;
-		border: 1px solid white;
-		background-color: var(--background-color);
-		color: white;
-		border-radius: 4px;
 		box-sizing: border-box;
 	}
-
-	.node:not(.leaf) .contents {
-		background-color: var(--background-color);
-	}
-
-	/* strong, span {
-		display: block;
-		font-size: 12px;
-		white-space: nowrap;
-		line-height: 1;
-	} */
 </style>
