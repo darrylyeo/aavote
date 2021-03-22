@@ -54,6 +54,10 @@
 		flex: 15em 1;
 		gap: 0.4em;
 	}
+
+	footer {
+		text-align: center;
+	}
 </style>
 
 <main>
@@ -95,6 +99,8 @@
 	</section>
 
 	<slot></slot>
+
+	<footer><strong><a href="https://github.com/darrylyeo/aavote" title="GitHub" target="_blank">Aavote</a></strong> • developed by <a href="https://darryl-yeo.com/aavote">Darryl Yeo</a> • 2021</footer>
 </main>
 
 <svg viewBox="0 0 34.374 50" style="position: fixed">
