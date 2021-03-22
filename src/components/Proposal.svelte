@@ -3,7 +3,7 @@
 
 	import * as d3 from 'd3-hierarchy'
 
-	const areaModes = ['equal', 'votingPower', 'voters']
+	const areaModes = {'equal': 'Equal', 'votingPower': 'Voting Power', 'voters': 'Voters'}
 	let currentAreaMode: 'equal' | 'votingPower' | 'voters' = 'equal'
 
 	$: treemapData = d3.hierarchy({
@@ -50,13 +50,13 @@
 		]
 	})
 	.eachAfter(node => {
-		for(const countProperty of areaModes)
+		for(const countProperty in areaModes)
 			if(countProperty !== 'equal')
 				node.data[countProperty] = (node.children || []).reduce((sum, child) => sum + +child.data[countProperty], +node.data[countProperty] || 0)
 	})
 
 	// Set the official .value property from which the d3-hierarchy layout is derived
-	$: treemapData.eachBefore(node => {
+	$: treemapData = treemapData.eachBefore(node => {
 		if(currentAreaMode === 'equal'){
 			node.value = 1 / (node.parent?.children.length || 1)
 		}
@@ -107,6 +107,7 @@
 
 	import Address from './Address.svelte'
 	import Date from './Date.svelte'
+	import Select from './Select.svelte'
 	import TreemapChart from './TreemapChart.svelte'
 </script>
 
@@ -208,6 +209,13 @@
 	.node.location-chart .percent {
 		font-size: 0.8em;
 	}
+
+	.footer-contents {
+		display: grid;
+		grid-auto-flow: column;
+		justify-content: end;
+		align-items: center;
+	}
 </style>
 
 <article class="proposal card state-{proposal.state.toLowerCase()}">
@@ -279,6 +287,11 @@
 						</p>
 						<strong><Address address={node.data.name} /></strong>
 					{/if}
+				</div>
+
+				<div slot="footer-contents" class="footer-contents">
+					Treemap Area:
+					<Select options={areaModes} bind:value={currentAreaMode} />
 				</div>
 			</TreemapChart>
 		{/if}

@@ -5,7 +5,7 @@
 
 	export let data
 
-	const root = d3.treemap()
+	$: root = d3.treemap()
 		// .tile(d3.treemapBinary)
 		// .tile(d3.treemapSquarify.ratio(3))
 		// .paddingTop(node => node.height / 100)
@@ -15,7 +15,7 @@
 		// .round(1)
 		(data)
 
-	let selected = root
+	$: selected = selected || root
 
 	const select = node => {
 		while (node.parent && node.parent !== selected) {
@@ -90,6 +90,12 @@
 	</Chart>
 </div>
 
+{#if $$slots['footer-contents']}
+	<footer>
+		<slot name="footer-contents"></slot>
+	</footer>
+{/if}
+
 <style>
 	.chart {
 		width: 100%;
@@ -127,7 +133,7 @@
 		color: transparent;
 	}
 
-	header {
+	header, footer {
 		display: grid;
 		gap: 0.5em;
 		font-size: 0.9em;
