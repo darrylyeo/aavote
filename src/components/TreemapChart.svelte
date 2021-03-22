@@ -78,6 +78,8 @@
 					class:leaf={!node.children}
 					class:is-visible={node.parent === selected || (node === selected && !node.children)}
 					on:click="{() => select(node)}"
+					on:keyup="{e => e.key === 'Enter' && select(node)}"
+					tabindex={node.parent === selected ? 0 : undefined}
 				>
 					<div class="node-inner" title={node.data.name}>
 						<slot name="node-contents" location="chart" {node}></slot>
