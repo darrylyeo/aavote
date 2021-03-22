@@ -7,7 +7,7 @@
 	let currentAreaMode: 'equal' | 'votingPower' | 'voters' = 'equal'
 
 	$: treemapData = d3.hierarchy({
-		type: 'root',
+		type: 'vote-distribution',
 		name: 'Vote Distribution',
 		// value: Number(proposal.totalVotingSupply),
 		children: [
@@ -235,21 +235,15 @@
 	{/await} -->
 
 	<div class="vote-details">
-		<div>
-			<p>Yes: {proposal.currentYesVote}</p>
-			<p>No: {proposal.currentNoVote}</p>
-			<p>Total Voting Supply: {formatVotingPower(proposal.totalVotingSupply)} <abbr title="Voting Power">VP</abbr></p>
-			<p>Total Proposition Supply: {formatVotingPower(proposal.totalPropositionSupply)} <abbr title="Voting Power">VP</abbr></p>
-			<p>Addresses voted: {proposal.totalCurrentVoters}</p>
-		</div>
 		{#if treemapData}
 			<TreemapChart data={treemapData}>
 				<div slot="node-contents" let:node
 					class="vote-node type-{node.data.type} support-{node.data.support}"
 				>
-					{#if node.data.type === 'root'}
+					{#if node.data.type === 'vote-distribution'}
 						<h4>{node.data.name}</h4>
-						<p>{formatVotingPower(node.data.votingPower)} <abbr title="Voting Power">VP</abbr></p>
+						<p>Total Voting Supply: {formatVotingPower(node.data.votingPower)} <abbr title="Voting Power">VP</abbr></p>
+						<p>Addresses voted: {proposal.totalCurrentVoters}</p>
 					{:else if node.data.type === 'voted'}
 						<h4>{node.data.name}</h4>
 						<p>{formatVotingPower(node.data.votingPower)} <abbr title="Voting Power">VP</abbr> ({formatPercent(node.data.votingPower / node.parent.data.votingPower)})</p>
