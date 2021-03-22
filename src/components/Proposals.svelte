@@ -13,8 +13,15 @@
 					authorized
 					propositionThreshold
 					votingDuration
+					voteDifferential
+					minimumQuorum
+					gracePeriod
+					executionDelay
+					admin
+					authorizationBlock
+					authorizationTimestamp
+					pendingAdmin
 				}
-				targets
 				values
 				signatures
 				calldatas

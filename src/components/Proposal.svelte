@@ -58,7 +58,7 @@
 	// Set the official .value property from which the d3-hierarchy layout is derived
 	$: treemapData = treemapData.eachBefore(node => {
 		if(currentAreaMode === 'equal'){
-			node.value = 1 / (node.parent?.children.length || 1)
+			node.value = 0.01 / (node.parent?.children.length || 1)
 		}
 
 		// Visualize area by property
@@ -66,7 +66,7 @@
 			// node.value = node.data[currentAreaMode]
 
 			// Adjust to ensure a minimum area
-			node.value = node.data[currentAreaMode] / treemapData.data[currentAreaMode] + 0.15 / (node.parent?.children.length || 1)
+			node.value = node.data[currentAreaMode] / treemapData.data[currentAreaMode] + 0.01 / (node.parent?.children.length || 1)
 			// node.value = node.data[currentAreaMode] / (node.parent?.data[currentAreaMode] || 1) * 100 + 1
 			// node.value = Math.log(node.data[currentAreaMode])
 			// console.log('node', node, node.data[currentAreaMode] / node.parent?.data[currentAreaMode])
@@ -193,11 +193,11 @@
 		font-size: 0.8em;
 		background-color: rgba(255, 255, 255, 0.5);
 	}
-	.node.location-chart.vote-Yes {
+	.node.location-chart.type-vote.vote-Yes {
 		background-color: var(--green);
 		color: white;
 	}
-	.node.location-chart.vote-No {
+	.node.location-chart.type-vote.vote-No {
 		background-color: var(--red);
 		color: white;
 	}
@@ -286,6 +286,17 @@
 							<span class="percent">({formatPercent(node.data.votingPower / node.parent.data.votingPower)}{location === 'header' ? ` of "${node.data.vote}" votes` : ''})</span>
 						</p>
 						<strong><Address address={node.data.name} /></strong>
+					{/if}
+					{#if proposal.executor.minimumQuorum && node.data.name === 'Votes'}
+						<p class="quorum">
+							Quorum:
+							{#if node.data.votingPower / node.parent.data.votingPower >= proposal.executor.minimumQuorum / 10000}
+								<strong style="color: var(--green)">Present</strong>
+							{:else}
+								<strong style="color: var(--red)">Absent</strong>
+							{/if}
+							(required: {formatPercent(proposal.executor.minimumQuorum / 10000)} of total voting supply)
+						</p>
 					{/if}
 				</div>
 
