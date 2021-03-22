@@ -132,7 +132,7 @@
 		gap: 1em;
 	}
 
-	.vote-details {
+	.analytics {
 		display: grid;
 		padding: 1em;
 		border-radius: 1rem;
@@ -182,7 +182,7 @@
 		opacity: 0.6;
 	}
 
-	.vote-node {
+	.node.location-chart {
 		border: 2px solid transparent;
 		padding: 0.5rem;
 		border-radius: 0.5em;
@@ -190,16 +190,16 @@
 		font-size: 0.8em;
 		background-color: rgba(255, 255, 255, 0.5);
 	}
-	.vote-node.support-true {
+	.node.location-chart.support-true {
 		background-color: var(--green);
 		color: white;
 	}
-	.vote-node.support-false {
+	.node.location-chart.support-false {
 		background-color: var(--red);
 		color: white;
 	}
 
-	.vote-node abbr {
+	.node.location-chart abbr {
 		text-decoration: none;
 	}
 </style>
@@ -234,22 +234,28 @@
 		{JSON.stringify(data)}
 	{/await} -->
 
-	<div class="vote-details">
+	<section class="analytics">
 		{#if treemapData}
 			<TreemapChart data={treemapData}>
-				<div slot="node-contents" let:node
-					class="vote-node type-{node.data.type} support-{node.data.support}"
+				<div slot="node-contents" let:node let:location
+					class="node location-{location} type-{node.data.type} support-{node.data.support}"
 				>
 					{#if node.data.type === 'vote-distribution'}
-						<h4>{node.data.name}</h4>
+						{#if location === 'chart'}
+							<h4>{node.data.name}</h4>
+						{/if}
 						<p>Total Voting Supply: {formatVotingPower(node.data.votingPower)} <abbr title="Voting Power">VP</abbr></p>
 						<p>Addresses voted: {proposal.totalCurrentVoters}</p>
 					{:else if node.data.type === 'voted'}
-						<h4>{node.data.name}</h4>
+						{#if location === 'chart'}
+							<h4>{node.data.name}</h4>
+						{/if}
 						<p>{formatVotingPower(node.data.votingPower)} <abbr title="Voting Power">VP</abbr> ({formatPercent(node.data.votingPower / node.parent.data.votingPower)})</p>
 						<p>{node.data.voters} voters</p>
 					{:else if node.data.type === 'vote-choice'}
-						<h4>{node.data.name}</h4>
+						{#if location === 'chart'}
+							<h4>{node.data.name}</h4>
+						{/if}
 						<p>{formatVotingPower(node.data.votingPower)} <abbr title="Voting Power">VP</abbr> ({formatPercent(node.data.votingPower / node.parent.data.votingPower)})</p>
 						<p>{node.data.voters} voters</p>
 					{:else if node.data.type === 'vote'}
@@ -259,7 +265,7 @@
 				</div>
 			</TreemapChart>
 		{/if}
-	</div>
+	</section>
 
 	<p class="links">
 		{#if proposal.discussions && proposal.discussions !== 'Na'}

@@ -15,6 +15,12 @@
 		justify-content: start;
 		align-items: baseline;
 	}
+	.breadcrumb > * {
+		transition: 0.3s;
+	}
+	.breadcrumb > :last-child {
+		font-weight: bold;
+	}
 
 	select {
 		all: inherit;
@@ -23,6 +29,9 @@
 
 	a, select {
 		cursor: pointer;
+	}
+	a {
+		text-decoration: underline;
 	}
 </style>
 

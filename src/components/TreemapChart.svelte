@@ -63,8 +63,10 @@
 </script>
 
 {#if selected}
-	<TreemapBreadcrumb bind:selected={selected} />
-	<slot name="node-contents" node={selected}></slot>
+	<header>
+		<h3><TreemapBreadcrumb bind:selected={selected} /></h3>
+		<slot name="node-contents" location="header" node={selected}></slot>
+	</header>
 {/if}
 
 <div class="chart">
@@ -78,7 +80,7 @@
 					on:click="{() => select(node)}"
 				>
 					<div class="node-inner">
-						<slot name="node-contents" {node}></slot>
+						<slot name="node-contents" location="chart" {node}></slot>
 					</div>
 				</div>
 			<!-- {/if} -->
@@ -121,5 +123,11 @@
 	.node:not(.is-visible) > .node-inner {
 		opacity: 0.1;
 		color: transparent;
+	}
+
+	header {
+		display: grid;
+		gap: 0.5em;
+		font-size: 0.9em;
 	}
 </style>
