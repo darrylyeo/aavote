@@ -19,23 +19,25 @@
 					{
 						type: 'vote-choice',
 						name: 'Yes Votes',
+						// vote: 'Yes',
 						children: proposal.votes.filter(vote => vote.support === true).map(vote => ({
 							type: 'vote',
 							name: vote.voter,
 							votingPower: vote.votingPower,
 							voters: 1,
-							support: vote.support
+							vote: 'Yes'
 						}))
 					},
 					{
 						type: 'vote-choice',
 						name: 'No Votes',
+						// vote: 'No',
 						children: proposal.votes.filter(vote => vote.support === false).map(vote => ({
 							type: 'vote',
 							name: vote.voter,
 							votingPower: vote.votingPower,
 							voters: 1,
-							support: vote.support
+							vote: 'No'
 						}))
 					}
 				]
@@ -190,17 +192,21 @@
 		font-size: 0.8em;
 		background-color: rgba(255, 255, 255, 0.5);
 	}
-	.node.location-chart.support-true {
+	.node.location-chart.vote-Yes {
 		background-color: var(--green);
 		color: white;
 	}
-	.node.location-chart.support-false {
+	.node.location-chart.vote-No {
 		background-color: var(--red);
 		color: white;
 	}
 
 	.node.location-chart abbr {
 		text-decoration: none;
+	}
+
+	.node.location-chart .percent {
+		font-size: 0.8em;
 	}
 </style>
 
@@ -238,28 +244,39 @@
 		{#if treemapData}
 			<TreemapChart data={treemapData}>
 				<div slot="node-contents" let:node let:location
-					class="node location-{location} type-{node.data.type} support-{node.data.support}"
+					class="node location-{location} type-{node.data.type} vote-{node.data.vote}"
 				>
 					{#if node.data.type === 'vote-distribution'}
 						{#if location === 'chart'}
 							<h4>{node.data.name}</h4>
 						{/if}
-						<p>Total Voting Supply: {formatVotingPower(node.data.votingPower)} <abbr title="Voting Power">VP</abbr></p>
+						<p>
+							Total Voting Supply: {formatVotingPower(node.data.votingPower)} <abbr title="Voting Power">VP</abbr>
+						</p>
 						<p>Addresses voted: {proposal.totalCurrentVoters}</p>
 					{:else if node.data.type === 'voted'}
 						{#if location === 'chart'}
 							<h4>{node.data.name}</h4>
 						{/if}
-						<p>{formatVotingPower(node.data.votingPower)} <abbr title="Voting Power">VP</abbr> ({formatPercent(node.data.votingPower / node.parent.data.votingPower)})</p>
+						<p>
+							{formatVotingPower(node.data.votingPower)} <abbr title="Voting Power">VP</abbr>
+							<span class="percent">({formatPercent(node.data.votingPower / node.parent.data.votingPower)} of total voting supply)</span>
+						</p>
 						<p>{node.data.voters} voters</p>
 					{:else if node.data.type === 'vote-choice'}
 						{#if location === 'chart'}
 							<h4>{node.data.name}</h4>
 						{/if}
-						<p>{formatVotingPower(node.data.votingPower)} <abbr title="Voting Power">VP</abbr> ({formatPercent(node.data.votingPower / node.parent.data.votingPower)})</p>
+						<p>
+							{formatVotingPower(node.data.votingPower)} <abbr title="Voting Power">VP</abbr>
+							<span class="percent">({formatPercent(node.data.votingPower / node.parent.data.votingPower)}<!-- {node.data.vote}-->)</span>
+						</p>
 						<p>{node.data.voters} voters</p>
 					{:else if node.data.type === 'vote'}
-						<p>{formatVotingPower(node.data.votingPower)} <abbr title="Voting Power">VP</abbr> ({formatPercent(node.data.votingPower / node.parent.data.votingPower)})</p>
+						<p>
+							{formatVotingPower(node.data.votingPower)} <abbr title="Voting Power">VP</abbr>
+							<span class="percent">({formatPercent(node.data.votingPower / node.parent.data.votingPower)}{location === 'header' ? ` of "${node.data.vote}" votes` : ''})</span>
+						</p>
 						<strong><Address address={node.data.name} /></strong>
 					{/if}
 				</div>
