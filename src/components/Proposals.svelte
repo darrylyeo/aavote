@@ -53,6 +53,8 @@
 	`)
 	query(proposals)
 
+	$: console.log($proposals.data)
+
 
 	import Proposal from './Proposal.svelte'
 </script>

@@ -77,7 +77,9 @@
 					class:is-visible={node.parent === selected || (node === selected && !node.children)}
 					on:click="{() => select(node)}"
 				>
-					<slot name="node-contents" {node}></slot>
+					<div class="node-inner">
+						<slot name="node-contents" {node}></slot>
+					</div>
 				</div>
 			<!-- {/if} -->
 		</Treemap>
@@ -99,10 +101,12 @@
 		pointer-events: all;
 		transition: 0.3s;
 	}
-	.node > :global(*) {
+	.node > .node-inner {
 		width: 100%;
 		height: 100%;
 		box-sizing: border-box;
+
+		display: grid;
 
 		transition: 300ms;
 	}
@@ -114,7 +118,7 @@
 	.node:not(.is-visible) {
 		pointer-events: none;
 	}
-	.node:not(.is-visible) > :global(*) {
+	.node:not(.is-visible) > .node-inner {
 		opacity: 0.1;
 		color: transparent;
 	}
