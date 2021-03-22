@@ -3,8 +3,8 @@
 
 	import * as d3 from 'd3-hierarchy'
 
-	const countProperties = ['votingPower', 'voters']
-	let currentCountProperty: 'votingPower' | 'voters' = 'votingPower'
+	const areaModes = ['equal', 'votingPower', 'voters']
+	let currentAreaMode: 'equal' | 'votingPower' | 'voters' = 'equal'
 
 	$: treemapData = d3.hierarchy({
 		type: 'root',
@@ -48,19 +48,27 @@
 		]
 	})
 	.eachAfter(node => {
-		for(const countProperty of countProperties)
-			node.data[countProperty] = (node.children || []).reduce((sum, child) => sum + +child.data[countProperty], +node.data[countProperty] || 0)
+		for(const countProperty of areaModes)
+			if(countProperty !== 'equal')
+				node.data[countProperty] = (node.children || []).reduce((sum, child) => sum + +child.data[countProperty], +node.data[countProperty] || 0)
 	})
 
 	// Set the official .value property from which the d3-hierarchy layout is derived
-	$: treemapData.eachAfter(node => {
-		// node.value = node.data[currentCountProperty]
+	$: treemapData.eachBefore(node => {
+		if(currentAreaMode === 'equal'){
+			node.value = 1 / (node.parent?.children.length || 1)
+		}
 
-		// Adjust to ensure a minimum area
-		node.value = node.data[currentCountProperty] / treemapData.data[currentCountProperty] + 0.1 / (node.parent?.children.length || 1)
-		// node.value = node.data[currentCountProperty] / (node.parent?.data[currentCountProperty] || 1) * 100 + 1
-		// node.value = Math.log(node.data[currentCountProperty])
-		// console.log('node', node, node.data[currentCountProperty] / node.parent?.data[currentCountProperty])
+		// Visualize area by property
+		else {
+			// node.value = node.data[currentAreaMode]
+
+			// Adjust to ensure a minimum area
+			node.value = node.data[currentAreaMode] / treemapData.data[currentAreaMode] + 0.15 / (node.parent?.children.length || 1)
+			// node.value = node.data[currentAreaMode] / (node.parent?.data[currentAreaMode] || 1) * 100 + 1
+			// node.value = Math.log(node.data[currentAreaMode])
+			// console.log('node', node, node.data[currentAreaMode] / node.parent?.data[currentAreaMode])
+		}
 	})
 		.sort((a, b) => b.height - a.height || b.value - a.value)
 
