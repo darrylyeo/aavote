@@ -79,7 +79,7 @@
 					class:is-visible={node.parent === selected || (node === selected && !node.children)}
 					on:click="{() => select(node)}"
 				>
-					<div class="node-inner">
+					<div class="node-inner" title={node.data.name}>
 						<slot name="node-contents" location="chart" {node}></slot>
 					</div>
 				</div>
