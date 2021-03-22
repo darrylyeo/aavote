@@ -6,7 +6,7 @@
 	export let data
 
 	const root = d3.treemap()
-		.tile(d3.treemapBinary)
+		// .tile(d3.treemapBinary)
 		// .tile(d3.treemapSquarify.ratio(3))
 		// .paddingTop(node => node.height / 100)
 		// .padding(5)
