@@ -54,7 +54,13 @@
 
 	// Set the official .value property from which the d3-hierarchy layout is derived
 	$: treemapData.eachAfter(node => {
-		node.value = node.data[currentCountProperty]
+		// node.value = node.data[currentCountProperty]
+
+		// Adjust to ensure a minimum area
+		node.value = node.data[currentCountProperty] / treemapData.data[currentCountProperty] + 0.1 / (node.parent?.children.length || 1)
+		// node.value = node.data[currentCountProperty] / (node.parent?.data[currentCountProperty] || 1) * 100 + 1
+		// node.value = Math.log(node.data[currentCountProperty])
+		// console.log('node', node, node.data[currentCountProperty] / node.parent?.data[currentCountProperty])
 	})
 		.sort((a, b) => b.height - a.height || b.value - a.value)
 
