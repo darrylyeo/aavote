@@ -97,12 +97,8 @@
 		height: 100%;
 		overflow: hidden;
 		pointer-events: all;
+		transition: 0.3s;
 	}
-
-	.node:not(.leaf) {
-		cursor: pointer;
-	}
-
 	.node > :global(*) {
 		width: 100%;
 		height: 100%;
@@ -110,9 +106,16 @@
 
 		transition: 300ms;
 	}
+
+	.node:not(.leaf) {
+		cursor: pointer;
+	}
+
+	.node:not(.is-visible) {
+		pointer-events: none;
+	}
 	.node:not(.is-visible) > :global(*) {
 		opacity: 0.1;
 		color: transparent;
-		/* pointer-events: none; */
 	}
 </style>
