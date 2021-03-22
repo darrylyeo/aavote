@@ -311,10 +311,14 @@
 	<p class="links">
 		{#if proposal.discussions && proposal.discussions !== 'Na'}
 			<!-- Discussion: <a href={proposal.discussions}>{new URL(proposal.discussions).host}</a> -->
-			<a href={proposal.discussions}>Discussion</a>
+			<a href={proposal.discussions} target="_blank">Discussion</a>
 			<span>•</span>
 		{/if}
-		<a href={explorerLink(proposal.govContract)}>Governance Contract</a>
+		<a href={explorerLink(proposal.govContract)} target="_blank">Governance Contract</a>
+		<span>•</span>
+		<a href={explorerLink(proposal.governanceStrategy) + "#code"} target="_blank">Governance Strategy</a>
+		<span>•</span>
+		<a href={explorerLink(proposal.creator)} target="_blank">Creator</a>
 	</p>
 
 	{#if proposal.author && proposal.author !== 'Na'}
