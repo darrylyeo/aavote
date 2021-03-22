@@ -60,7 +60,7 @@
 	<header>
 		<h1>Aavote</h1>
 		<div>
-			<p>unofficial dashboard for Aave Governance v2</p>
+			<p>dashboard for Aave Governance v2</p>
 		</div>
 	</header>
 
