@@ -120,9 +120,11 @@
 		display: grid;
 	}
 	.proposal.state-pending,
-	.proposal.state-active,
-	.proposal.state-queued {
+	.proposal.state-active {
 		--state-color: var(--yellow);
+	}
+	.proposal.state-queued {
+		--state-color: var(--aave-teal);
 	}
 	.proposal.state-failed,
 	.proposal.state-canceled {
@@ -137,6 +139,28 @@
 		display: grid;
 		grid-template-columns: auto 1fr;
 		gap: 1em;
+		align-items: center;
+	}
+
+	.tag {
+		background-color: rgba(0, 0, 0, 0.2);
+		border-radius: 0.4em;
+		padding: 0.25em 0.4em;
+
+		font-size: 0.8em;
+		font-weight: bold;
+		vertical-align: middle;
+	}
+
+	.state {
+		background: radial-gradient(transparent -200%, var(--state-color) 500%);
+		background-color: rgba(255, 255, 255, 0.5);
+		color: rgba(0, 0, 0, 0.65);
+		font-size: 0.45em;
+		font-weight: bold;
+		text-transform: uppercase;
+		letter-spacing: 0.15ch;
+		margin-left: 0.5ch;
 	}
 
 	.analytics {
@@ -158,6 +182,7 @@
 
 		width: 3.33em;
 		height: 3.33em;
+		background: linear-gradient(333deg, transparent -300%, var(--state-color) 1000%);
 		background-color: rgba(255, 255, 255, 0.5);
 		border-radius: 0.5em;
 
@@ -193,13 +218,7 @@
 		opacity: 0.8;
 	}
 	.handle {
-		background-color: rgba(0, 0, 0, 0.15);
-		border-radius: 0.4em;
-		padding: 0.25em 0.4em;
-
-		font-size: 0.8em;
-		font-weight: bold;
-		vertical-align: middle;
+		opacity: 0.85;
 	}
 
 	.node.location-chart {
@@ -243,7 +262,10 @@
 			<span class="number">#{proposal.aipNumber}</span>
 		</span>
 		<div>
-			<h2>{proposal.title}</h2>
+			<h2>
+				{proposal.title}
+				<span class="state tag">{proposal.state}</span>
+			</h2>
 			<p class="status-and-dates">
 				<span class="created">created <Date timestamp={proposal.createdTimestamp} /></span>
 				{#if proposal.lastUpdateTimestamp != proposal.createdTimestamp}
@@ -346,7 +368,7 @@
 				{#if i}, {/if}
 				<!-- <a href="https://twitter.com/{handle}" target="_blank">{name}</a> -->
 				{name}
-				<span class="handle">@{handle}</span>
+				<span class="handle tag">@{handle}</span>
 			{/each}
 		</p>
 	{/if}
