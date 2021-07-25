@@ -23,6 +23,7 @@
 					authorizationTimestamp
 					pendingAdmin
 				}
+				targets
 				values
 				signatures
 				calldatas
