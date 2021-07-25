@@ -1,143 +1,104 @@
-import path from 'path';
+import svelte from 'rollup-plugin-svelte-hot';
+import Hmr from 'rollup-plugin-hot'
 import resolve from '@rollup/plugin-node-resolve';
-import replace from '@rollup/plugin-replace';
 import commonjs from '@rollup/plugin-commonjs';
-import url from '@rollup/plugin-url';
-import svelte from 'rollup-plugin-svelte';
-import babel from '@rollup/plugin-babel';
+import livereload from 'rollup-plugin-livereload';
 import { terser } from 'rollup-plugin-terser';
-import sveltePreprocess from 'svelte-preprocess';
 import typescript from '@rollup/plugin-typescript';
-import config from 'sapper/config/rollup.js';
-import pkg from './package.json';
+import { copySync, removeSync } from 'fs-extra'
+import { spassr } from 'spassr'
+import getConfig from '@roxi/routify/lib/utils/config'
+import autoPreprocess from 'svelte-preprocess'
+import postcssImport from 'postcss-import'
+import { injectManifest } from 'rollup-plugin-workbox'
 
 import houdini from 'houdini-preprocess'
 
-const mode = process.env.NODE_ENV;
-const dev = mode === 'development';
-const legacy = !!process.env.SAPPER_LEGACY_BUILD;
 
-const onwarn = (warning, onwarn) =>
-	(warning.code === 'MISSING_EXPORT' && /'preload'/.test(warning.message)) ||
-	(warning.code === 'CIRCULAR_DEPENDENCY' && /[/\\]@sapper[/\\]/.test(warning.message)) ||
-	(warning.code === 'THIS_IS_UNDEFINED') ||
-	onwarn(warning);
+const { distDir } = getConfig() // use Routify's distDir for SSOT
+const assetsDir = 'assets'
+const buildDir = `${distDir}/build`
+const isNollup = !!process.env.NOLLUP
+const production = !process.env.ROLLUP_WATCH;
+
+// clear previous builds
+removeSync(distDir)
+removeSync(buildDir)
+
+
+const serve = () => ({
+    writeBundle: async () => {
+        const options = {
+            assetsDir: [assetsDir, distDir],
+            entrypoint: `${assetsDir}/__app.html`,
+            script: `${buildDir}/main.js`
+        }
+        spassr({ ...options, port: 5000 })
+        spassr({ ...options, ssr: true, port: 5005, ssrOptions: { inlineDynamicImports: true, dev: true } })
+    }
+})
+const copyToDist = () => ({ writeBundle() { copySync(assetsDir, distDir) } })
+
 
 export default {
-	client: {
-		input: config.client.input().replace(/\.js$/, '.ts'),
-		output: config.client.output(),
-		plugins: [
-			replace({
-				preventAssignment: true,
-				values:{
-					'process.browser': true,
-					'process.env.NODE_ENV': JSON.stringify(mode)
-				},
-			}),
-			svelte({
-				preprocess: [
-					sveltePreprocess({ sourceMap: dev }),
-					houdini()
-				],
-				compilerOptions: {
-					dev,
-					hydratable: true
-				}
-			}),
-			url({
-				sourceDir: path.resolve(__dirname, 'src/node_modules/images'),
-				publicPath: '/client/'
-			}),
-			resolve({
-				browser: true,
-				dedupe: ['svelte']
-			}),
-			commonjs(),
-			typescript({ sourceMap: dev }),
+    preserveEntrySignatures: false,
+    input: ['src/main.ts'],
+    output: {
+        sourcemap: true,
+        format: 'esm',
+        dir: buildDir,
+        // for performance, disabling filename hashing in development
+        chunkFileNames:`[name]${production && '-[hash]' || ''}.js`
+    },
+    plugins: [
+        svelte({
+            dev: !production, // run-time checks      
+            // Extract component CSS — better performance
+            css: css => css.write(`bundle.css`),
+            hot: isNollup,
+            preprocess: [
+                autoPreprocess({
+                    postcss: { plugins: [postcssImport()] },
+                    defaults: { style: 'postcss' }
+                }),
+				houdini()
+            ]
+        }),
 
-			legacy && babel({
-				extensions: ['.js', '.mjs', '.html', '.svelte'],
-				babelHelpers: 'runtime',
-				exclude: ['node_modules/@babel/**'],
-				presets: [
-					['@babel/preset-env', {
-						targets: '> 0.25%, not dead'
-					}]
-				],
-				plugins: [
-					'@babel/plugin-syntax-dynamic-import',
-					['@babel/plugin-transform-runtime', {
-						useESModules: true
-					}]
-				]
-			}),
+        // resolve matching modules from current working directory
+        resolve({
+            browser: true,
+            dedupe: importee => !!importee.match(/svelte(\/|$)/)
+        }),
+        commonjs(),
+		typescript({
+			sourceMap: !production,
+			inlineSources: !production
+		}),
 
-			!dev && terser({
-				module: true
-			})
-		],
-
-		preserveEntrySignatures: false,
-		onwarn,
-	},
-
-	server: {
-		input: { server: config.server.input().server.replace(/\.js$/, ".ts") },
-		output: config.server.output(),
-		plugins: [
-			replace({
-				preventAssignment: true,
-				values:{
-					'process.browser': false,
-					'process.env.NODE_ENV': JSON.stringify(mode)
-				},
-			}),
-			svelte({
-				preprocess: [
-					sveltePreprocess({ sourceMap: dev }),
-					houdini()
-				],
-				compilerOptions: {
-					dev,
-					generate: 'ssr',
-					hydratable: true
-				},
-				emitCss: false
-			}),
-			url({
-				sourceDir: path.resolve(__dirname, 'src/node_modules/images'),
-				publicPath: '/client/',
-				emitFiles: false // already emitted by client build
-			}),
-			resolve({
-				dedupe: ['svelte']
-			}),
-			commonjs(),
-			typescript({ sourceMap: dev })
-		],
-		external: Object.keys(pkg.dependencies).concat(require('module').builtinModules),
-		preserveEntrySignatures: 'strict',
-		onwarn,
-	},
-
-	serviceworker: {
-		input: config.serviceworker.input().replace(/\.js$/, '.ts'),
-		output: config.serviceworker.output(),
-		plugins: [
-			resolve(),
-			replace({
-				preventAssignment: true,
-				values:{
-					'process.browser': true,
-					'process.env.NODE_ENV': JSON.stringify(mode)
-				},
-			}),
-			commonjs(),
-			typescript({ sourceMap: dev }),
-			!dev && terser()
-		],
-		preserveEntrySignatures: false,
-		onwarn,
-	}
-};
+        production && terser(),
+        !production && !isNollup && serve(),
+        !production && !isNollup && livereload(distDir), // refresh entire window when code is updated
+        !production && isNollup && Hmr({ inMemory: true, public: assetsDir, }), // refresh only updated code
+        {
+            // provide node environment on the client
+            transform: code => ({
+                code: code.replace(/process\.env\.NODE_ENV/g, `"${process.env.NODE_ENV}"`),
+                map: { mappings: '' }
+            })
+        },
+        injectManifest({
+            globDirectory: assetsDir,
+            globPatterns: ['**/*.{js,css,svg}', '__app.html'],
+            swSrc: `src/sw.js`,
+            swDest: `${distDir}/serviceworker.js`,
+            maximumFileSizeToCacheInBytes: 10000000, // 10 MB,
+            mode: 'production'
+        }),
+        production && copyToDist(),
+    ],
+    watch: {
+        clearScreen: false,
+        buildDelay: 100,
+    }
+}

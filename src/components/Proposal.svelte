@@ -1,6 +1,82 @@
 <script lang="ts">
 	export let proposal
 
+	import * as d3 from 'd3-hierarchy'
+
+	const areaModes = {'equal': 'Equal', 'votingPower': 'Voting Power', 'voters': 'Voters'}
+	let currentAreaMode: 'equal' | 'votingPower' | 'voters' = 'equal'
+
+	$: treemapData = d3.hierarchy({
+		type: 'vote-distribution',
+		name: 'Vote Distribution',
+		// value: Number(proposal.totalVotingSupply),
+		children: [
+			{
+				type: 'voted',
+				name: 'Votes',
+				// value: Number(proposal.currentYesVote) + Number(proposal.currentNoVote),
+				children: [
+					{
+						type: 'vote-choice',
+						name: 'Yes Votes',
+						// vote: 'Yes',
+						children: proposal.votes.filter(vote => vote.support === true).map(vote => ({
+							type: 'vote',
+							name: vote.voter,
+							votingPower: vote.votingPower,
+							voters: 1,
+							vote: 'Yes'
+						}))
+					},
+					{
+						type: 'vote-choice',
+						name: 'No Votes',
+						// vote: 'No',
+						children: proposal.votes.filter(vote => vote.support === false).map(vote => ({
+							type: 'vote',
+							name: vote.voter,
+							votingPower: vote.votingPower,
+							voters: 1,
+							vote: 'No'
+						}))
+					}
+				]
+			},
+			{
+				type: 'voted',
+				name: 'Non-Votes',
+				votingPower: Number(proposal.totalVotingSupply) - (Number(proposal.currentYesVote) + Number(proposal.currentNoVote))
+			}
+		]
+	})
+	.eachAfter(node => {
+		for(const countProperty in areaModes)
+			if(countProperty !== 'equal')
+				node.data[countProperty] = (node.children || []).reduce((sum, child) => sum + +child.data[countProperty], +node.data[countProperty] || 0)
+	})
+
+	// Set the official .value property from which the d3-hierarchy layout is derived
+	$: treemapData = treemapData.eachBefore(node => {
+		if(currentAreaMode === 'equal'){
+			node.value = 0.01 / (node.parent?.children.length || 1)
+		}
+
+		// Visualize area by property
+		else {
+			// node.value = node.data[currentAreaMode]
+
+			// Adjust to ensure a minimum area
+			node.value = node.data[currentAreaMode] / treemapData.data[currentAreaMode] + 0.01 / (node.parent?.children.length || 1)
+			// node.value = node.data[currentAreaMode] / (node.parent?.data[currentAreaMode] || 1) * 100 + 1
+			// node.value = Math.log(node.data[currentAreaMode])
+			// console.log('node', node, node.data[currentAreaMode] / node.parent?.data[currentAreaMode])
+		}
+	})
+		.sort((a, b) => b.height - a.height || b.value - a.value)
+
+	$: console.log(treemapData)
+
+
 	const regex = /^AIP (\d+):/
 	$: if(proposal.aipNumber == 0){
 		const match = proposal.title.match(regex)
@@ -15,31 +91,42 @@
 		return `https://etherscan.io/address/${address}`
 	}
 
+	function formatPercent(number, maxDecimals = 3){
+		return new Intl.NumberFormat(globalThis.navigator.languages, {
+			minimumFractionDigits: maxDecimals,
+			maximumFractionDigits: maxDecimals
+		}).format(number * 100) + '%'
+	}
+	function formatVotingPower(number, maxDecimals = 0){
+		return new Intl.NumberFormat(globalThis.navigator.languages, {
+			minimumFractionDigits: maxDecimals,
+			maximumFractionDigits: maxDecimals
+		}).format(number / 1e18)// + ' quintillion'
+	}
 
+
+	import Address from './Address.svelte'
 	import Date from './Date.svelte'
+	import Select from './Select.svelte'
+	import TreemapChart from './TreemapChart.svelte'
 </script>
 
 <style>
 	.proposal {
 		display: grid;
-
-		background-color: rgba(255, 255, 255, 0.8);
-		border-radius: 1rem;
-		padding: 1.5rem;
-		mix-blend-mode: overlay;
 	}
 	.proposal.state-pending,
 	.proposal.state-active,
 	.proposal.state-queued {
-		--state-color: rgb(222, 202, 89);
+		--state-color: var(--yellow);
 	}
 	.proposal.state-failed,
 	.proposal.state-canceled {
-		--state-color: rgb(222, 89, 89);
+		--state-color: var(--red);
 	}
 	.proposal.state-succeeded,
 	.proposal.state-executed {
-		--state-color: rgb(121, 201, 130);
+		--state-color: var(--green);
 	}
 
 	header {
@@ -48,7 +135,7 @@
 		gap: 1em;
 	}
 
-	.vote-details {
+	.analytics {
 		display: grid;
 		padding: 1em;
 		border-radius: 1rem;
@@ -97,9 +184,41 @@
 		font-size: 0.85em;
 		opacity: 0.6;
 	}
+
+	.node.location-chart {
+		border: 2px solid transparent;
+		padding: 0.5rem;
+		border-radius: 0.5em;
+		background-clip: padding-box;
+		font-size: 0.8em;
+		background-color: rgba(255, 255, 255, 0.5);
+	}
+	.node.location-chart.type-vote.vote-Yes {
+		background-color: var(--green);
+		color: white;
+	}
+	.node.location-chart.type-vote.vote-No {
+		background-color: var(--red);
+		color: white;
+	}
+
+	.node.location-chart abbr {
+		text-decoration: none;
+	}
+
+	.node.location-chart .percent {
+		font-size: 0.8em;
+	}
+
+	.footer-contents {
+		display: grid;
+		grid-auto-flow: column;
+		justify-content: end;
+		align-items: center;
+	}
 </style>
 
-<article class="proposal state-{proposal.state.toLowerCase()}">
+<article class="proposal card state-{proposal.state.toLowerCase()}">
 	<header>
 		<span class="aip-number">
 			<span class="aip">AIP</span>
@@ -129,23 +248,77 @@
 		{JSON.stringify(data)}
 	{/await} -->
 
-	<div class="vote-details">
-		<div>
-			<p>Yes: {proposal.currentYesVote}</p>
-			<p>No: {proposal.currentNoVote}</p>
-			<p>Total Voting Supply: {proposal.totalVotingSupply}</p>
-			<p>Total Proposition Supply: {proposal.totalPropositionSupply}</p>
-			<p>Addresses voted: {proposal.totalCurrentVoters}</p>
-		</div>
-	</div>
+	<section class="analytics">
+		{#if treemapData}
+			<TreemapChart data={treemapData}>
+				<div slot="node-contents" let:node let:location
+					class="node location-{location} type-{node.data.type} vote-{node.data.vote}"
+				>
+					{#if node.data.type === 'vote-distribution'}
+						{#if location === 'chart'}
+							<h4>{node.data.name}</h4>
+						{/if}
+						<p>
+							Total Voting Supply: {formatVotingPower(node.data.votingPower)} <abbr title="Voting Power">VP</abbr>
+						</p>
+						<p>Addresses voted: {proposal.totalCurrentVoters}</p>
+					{:else if node.data.type === 'voted'}
+						{#if location === 'chart'}
+							<h4>{node.data.name}</h4>
+						{/if}
+						<p>
+							{formatVotingPower(node.data.votingPower)} <abbr title="Voting Power">VP</abbr>
+							<span class="percent">({formatPercent(node.data.votingPower / node.parent.data.votingPower)} of total voting supply)</span>
+						</p>
+						<p>{node.data.voters} voters</p>
+					{:else if node.data.type === 'vote-choice'}
+						{#if location === 'chart'}
+							<h4>{node.data.name}</h4>
+						{/if}
+						<p>
+							{formatVotingPower(node.data.votingPower)} <abbr title="Voting Power">VP</abbr>
+							<span class="percent">({formatPercent(node.data.votingPower / node.parent.data.votingPower)}<!-- {node.data.vote}-->)</span>
+						</p>
+						<p>{node.data.voters} voters</p>
+					{:else if node.data.type === 'vote'}
+						<p>
+							{formatVotingPower(node.data.votingPower)} <abbr title="Voting Power">VP</abbr>
+							<span class="percent">({formatPercent(node.data.votingPower / node.parent.data.votingPower)}{location === 'header' ? ` of "${node.data.vote}" votes` : ''})</span>
+						</p>
+						<strong><Address address={node.data.name} /></strong>
+					{/if}
+					{#if proposal.executor.minimumQuorum && node.data.name === 'Votes'}
+						<p class="quorum">
+							Quorum:
+							{#if node.data.votingPower / node.parent.data.votingPower >= proposal.executor.minimumQuorum / 10000}
+								<strong style="color: var(--green)">Present</strong>
+							{:else}
+								<strong style="color: var(--red)">Absent</strong>
+							{/if}
+							(required: {formatPercent(proposal.executor.minimumQuorum / 10000)} of total voting supply)
+						</p>
+					{/if}
+				</div>
+
+				<div slot="footer-contents" class="footer-contents">
+					Treemap Area:
+					<Select options={areaModes} bind:value={currentAreaMode} />
+				</div>
+			</TreemapChart>
+		{/if}
+	</section>
 
 	<p class="links">
 		{#if proposal.discussions && proposal.discussions !== 'Na'}
 			<!-- Discussion: <a href={proposal.discussions}>{new URL(proposal.discussions).host}</a> -->
-			<a href={proposal.discussions}>Discussion</a>
+			<a href={proposal.discussions} target="_blank">Discussion</a>
 			<span>•</span>
 		{/if}
-		<a href={explorerLink(proposal.govContract)}>Governance Contract</a>
+		<a href={explorerLink(proposal.govContract)} target="_blank">Governance Contract</a>
+		<span>•</span>
+		<a href={explorerLink(proposal.governanceStrategy) + "#code"} target="_blank">Governance Strategy</a>
+		<span>•</span>
+		<a href={explorerLink(proposal.creator)} target="_blank">Creator</a>
 	</p>
 
 	{#if proposal.author && proposal.author !== 'Na'}

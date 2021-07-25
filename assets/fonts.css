@@ -1,0 +1,11 @@
+@font-face {
+	font-family: 'Varela Round';
+	font-style: normal;
+	font-display: swap;
+	font-weight: 400;
+	src:
+		local('Varela Round Regular'),
+		local('VarelaRound-Regular'),
+		url('/varela-round-latin-400-normal.woff2') format('woff2'),
+		url('/varela-round-latin-400-normal.woff') format('woff');
+}
