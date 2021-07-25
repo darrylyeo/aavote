@@ -1,5 +1,8 @@
 <script lang="ts">
-	export let proposal
+	import type { AllProposals } from '$houdini'
+
+	export let proposal: AllProposals['result']['proposals'][number]
+
 
 	import * as d3 from 'd3-hierarchy'
 
@@ -111,6 +114,7 @@
 	import TreemapChart from './TreemapChart.svelte'
 </script>
 
+
 <style>
 	.proposal {
 		display: grid;
@@ -217,6 +221,7 @@
 		align-items: center;
 	}
 </style>
+
 
 <article class="proposal card state-{proposal.state.toLowerCase()}">
 	<header>
