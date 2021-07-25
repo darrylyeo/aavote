@@ -188,6 +188,19 @@
 		font-size: 0.85em;
 		opacity: 0.6;
 	}
+	.proposed-by {
+		font-weight: bold;
+		opacity: 0.8;
+	}
+	.handle {
+		background-color: rgba(0, 0, 0, 0.15);
+		border-radius: 0.4em;
+		padding: 0.25em 0.4em;
+
+		font-size: 0.8em;
+		font-weight: bold;
+		vertical-align: middle;
+	}
 
 	.node.location-chart {
 		border: 2px solid transparent;
@@ -327,6 +340,14 @@
 	</p>
 
 	{#if proposal.author && proposal.author !== 'Na'}
-		<p class="authors">Proposed by: {proposal.author}</p>
+		<p class="authors">
+			<span class="proposed-by">Proposed by:</span>
+			{#each [...proposal.author.matchAll(/(?:^|, )(.+?)(?: \(@(.+?)\))/g) || []] as [matchMedia, name, handle], i}
+				{#if i}, {/if}
+				<!-- <a href="https://twitter.com/{handle}" target="_blank">{name}</a> -->
+				{name}
+				<span class="handle">@{handle}</span>
+			{/each}
+		</p>
 	{/if}
 </article>
