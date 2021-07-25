@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { query, graphql, AllProposals } from '$houdini'
+	import type { AllProposals } from '$houdini'
+	import { query, graphql } from '$houdini'
 
-    // load the items
-    const { data: proposals } = query<AllProposals>(graphql`
-        query AllProposals {
+	const { loading, data, error } = query<AllProposals>(graphql`
+		query AllProposals {
 			proposals(first: 100, orderBy: createdTimestamp, orderDirection: desc) {
 				id
-				# state
+				state
 				ipfsHash
 				creator
 				executor {
@@ -14,8 +14,15 @@
 					authorized
 					propositionThreshold
 					votingDuration
+					voteDifferential
+					minimumQuorum
+					gracePeriod
+					executionDelay
+					admin
+					authorizationBlock
+					authorizationTimestamp
+					pendingAdmin
 				}
-				targets
 				values
 				signatures
 				calldatas
@@ -25,7 +32,7 @@
 				governanceStrategy
 				currentYesVote
 				currentNoVote
-				# winner
+				winner
 				votes {
 					id
 					voter
@@ -53,9 +60,12 @@
 		}
 	`)
 
+	$: console.log($data)
 
-	import Proposal from './Proposal.svelte'
+
+	import ProposalComponent from './Proposal.svelte'
 </script>
+
 
 <style>
 	.proposals {
@@ -64,14 +74,15 @@
 </style>
 
 
-{#if $proposals.fetching}
+{#if $loading}
 	Loading proposals...
-{:else if $proposals.error}
+{:else if $error}
 	Error fetching proposals.
-{:else if $proposals.data}
+	{$error}
+{:else if $data}
 	<div class="proposals">
-		{#each $proposals.data.proposals as proposal (proposal.id)}
-			<Proposal {proposal} />
+		{#each $data.proposals as proposal (proposal.id)}
+			<ProposalComponent {proposal} />
 		{/each}
 	</div>
 {/if}

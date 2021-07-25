@@ -1,0 +1,716 @@
+directive @derivedFrom(field: String) on FIELD_DEFINITION
+
+directive @entity on OBJECT
+
+directive @subgraphId(id: String) on OBJECT
+
+scalar BigDecimal
+
+scalar BigInt
+
+input Block_height {
+  hash: Bytes
+  number: Int
+}
+
+scalar Bytes
+
+type Executor {
+  admin: Bytes!
+  authorizationBlock: BigInt!
+  authorizationTimestamp: BigInt!
+  authorized: Boolean!
+  executionDelay: BigInt!
+  gracePeriod: BigInt!
+  id: ID!
+  minimumQuorum: BigInt!
+  pendingAdmin: Bytes
+  propositionThreshold: BigInt!
+  voteDifferential: BigInt!
+  votingDuration: BigInt!
+}
+
+input Executor_filter {
+  admin: Bytes
+  admin_contains: Bytes
+  admin_in: [Bytes!]
+  admin_not: Bytes
+  admin_not_contains: Bytes
+  admin_not_in: [Bytes!]
+  authorizationBlock: BigInt
+  authorizationBlock_gt: BigInt
+  authorizationBlock_gte: BigInt
+  authorizationBlock_in: [BigInt!]
+  authorizationBlock_lt: BigInt
+  authorizationBlock_lte: BigInt
+  authorizationBlock_not: BigInt
+  authorizationBlock_not_in: [BigInt!]
+  authorizationTimestamp: BigInt
+  authorizationTimestamp_gt: BigInt
+  authorizationTimestamp_gte: BigInt
+  authorizationTimestamp_in: [BigInt!]
+  authorizationTimestamp_lt: BigInt
+  authorizationTimestamp_lte: BigInt
+  authorizationTimestamp_not: BigInt
+  authorizationTimestamp_not_in: [BigInt!]
+  authorized: Boolean
+  authorized_in: [Boolean!]
+  authorized_not: Boolean
+  authorized_not_in: [Boolean!]
+  executionDelay: BigInt
+  executionDelay_gt: BigInt
+  executionDelay_gte: BigInt
+  executionDelay_in: [BigInt!]
+  executionDelay_lt: BigInt
+  executionDelay_lte: BigInt
+  executionDelay_not: BigInt
+  executionDelay_not_in: [BigInt!]
+  gracePeriod: BigInt
+  gracePeriod_gt: BigInt
+  gracePeriod_gte: BigInt
+  gracePeriod_in: [BigInt!]
+  gracePeriod_lt: BigInt
+  gracePeriod_lte: BigInt
+  gracePeriod_not: BigInt
+  gracePeriod_not_in: [BigInt!]
+  id: ID
+  id_gt: ID
+  id_gte: ID
+  id_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_not: ID
+  id_not_in: [ID!]
+  minimumQuorum: BigInt
+  minimumQuorum_gt: BigInt
+  minimumQuorum_gte: BigInt
+  minimumQuorum_in: [BigInt!]
+  minimumQuorum_lt: BigInt
+  minimumQuorum_lte: BigInt
+  minimumQuorum_not: BigInt
+  minimumQuorum_not_in: [BigInt!]
+  pendingAdmin: Bytes
+  pendingAdmin_contains: Bytes
+  pendingAdmin_in: [Bytes!]
+  pendingAdmin_not: Bytes
+  pendingAdmin_not_contains: Bytes
+  pendingAdmin_not_in: [Bytes!]
+  propositionThreshold: BigInt
+  propositionThreshold_gt: BigInt
+  propositionThreshold_gte: BigInt
+  propositionThreshold_in: [BigInt!]
+  propositionThreshold_lt: BigInt
+  propositionThreshold_lte: BigInt
+  propositionThreshold_not: BigInt
+  propositionThreshold_not_in: [BigInt!]
+  voteDifferential: BigInt
+  voteDifferential_gt: BigInt
+  voteDifferential_gte: BigInt
+  voteDifferential_in: [BigInt!]
+  voteDifferential_lt: BigInt
+  voteDifferential_lte: BigInt
+  voteDifferential_not: BigInt
+  voteDifferential_not_in: [BigInt!]
+  votingDuration: BigInt
+  votingDuration_gt: BigInt
+  votingDuration_gte: BigInt
+  votingDuration_in: [BigInt!]
+  votingDuration_lt: BigInt
+  votingDuration_lte: BigInt
+  votingDuration_not: BigInt
+  votingDuration_not_in: [BigInt!]
+}
+
+enum Executor_orderBy {
+  admin
+  authorizationBlock
+  authorizationTimestamp
+  authorized
+  executionDelay
+  gracePeriod
+  id
+  minimumQuorum
+  pendingAdmin
+  propositionThreshold
+  voteDifferential
+  votingDuration
+}
+
+enum OrderDirection {
+  asc
+  desc
+}
+
+type Proposal {
+  aipNumber: BigInt!
+  author: String!
+  calldatas: [Bytes!]
+  createdBlockNumber: BigInt!
+  createdTimestamp: Int!
+  creator: Bytes!
+  currentNoVote: BigInt!
+  currentYesVote: BigInt!
+  discussions: String!
+  endBlock: BigInt!
+  executionTime: BigInt
+  executor: Executor
+  govContract: Bytes!
+  governanceStrategy: Bytes!
+
+  """
+  proposal id
+  
+  """
+  id: ID!
+  initiatorExecution: Bytes
+  initiatorQueueing: Bytes
+  ipfsHash: String!
+  lastUpdateBlock: BigInt!
+  lastUpdateTimestamp: Int!
+  shortDescription: String!
+  signatures: [String!]
+  startBlock: BigInt!
+  state: ProposalState!
+  targets: [Bytes!]
+  title: String!
+  totalCurrentVoters: Int!
+  totalPropositionSupply: BigInt!
+  totalVotingSupply: BigInt!
+  values: [BigInt!]
+  votes(first: Int = 100, orderBy: Vote_orderBy, orderDirection: OrderDirection, skip: Int = 0, where: Vote_filter): [Vote!]!
+  winner: Winner!
+  withDelegatecalls: [Boolean!]
+}
+
+enum ProposalState {
+  Active
+  Canceled
+  Executed
+  Failed
+  Pending
+  Queued
+  Succeeded
+}
+
+input Proposal_filter {
+  aipNumber: BigInt
+  aipNumber_gt: BigInt
+  aipNumber_gte: BigInt
+  aipNumber_in: [BigInt!]
+  aipNumber_lt: BigInt
+  aipNumber_lte: BigInt
+  aipNumber_not: BigInt
+  aipNumber_not_in: [BigInt!]
+  author: String
+  author_contains: String
+  author_ends_with: String
+  author_gt: String
+  author_gte: String
+  author_in: [String!]
+  author_lt: String
+  author_lte: String
+  author_not: String
+  author_not_contains: String
+  author_not_ends_with: String
+  author_not_in: [String!]
+  author_not_starts_with: String
+  author_starts_with: String
+  calldatas: [Bytes!]
+  calldatas_contains: [Bytes!]
+  calldatas_not: [Bytes!]
+  calldatas_not_contains: [Bytes!]
+  createdBlockNumber: BigInt
+  createdBlockNumber_gt: BigInt
+  createdBlockNumber_gte: BigInt
+  createdBlockNumber_in: [BigInt!]
+  createdBlockNumber_lt: BigInt
+  createdBlockNumber_lte: BigInt
+  createdBlockNumber_not: BigInt
+  createdBlockNumber_not_in: [BigInt!]
+  createdTimestamp: Int
+  createdTimestamp_gt: Int
+  createdTimestamp_gte: Int
+  createdTimestamp_in: [Int!]
+  createdTimestamp_lt: Int
+  createdTimestamp_lte: Int
+  createdTimestamp_not: Int
+  createdTimestamp_not_in: [Int!]
+  creator: Bytes
+  creator_contains: Bytes
+  creator_in: [Bytes!]
+  creator_not: Bytes
+  creator_not_contains: Bytes
+  creator_not_in: [Bytes!]
+  currentNoVote: BigInt
+  currentNoVote_gt: BigInt
+  currentNoVote_gte: BigInt
+  currentNoVote_in: [BigInt!]
+  currentNoVote_lt: BigInt
+  currentNoVote_lte: BigInt
+  currentNoVote_not: BigInt
+  currentNoVote_not_in: [BigInt!]
+  currentYesVote: BigInt
+  currentYesVote_gt: BigInt
+  currentYesVote_gte: BigInt
+  currentYesVote_in: [BigInt!]
+  currentYesVote_lt: BigInt
+  currentYesVote_lte: BigInt
+  currentYesVote_not: BigInt
+  currentYesVote_not_in: [BigInt!]
+  discussions: String
+  discussions_contains: String
+  discussions_ends_with: String
+  discussions_gt: String
+  discussions_gte: String
+  discussions_in: [String!]
+  discussions_lt: String
+  discussions_lte: String
+  discussions_not: String
+  discussions_not_contains: String
+  discussions_not_ends_with: String
+  discussions_not_in: [String!]
+  discussions_not_starts_with: String
+  discussions_starts_with: String
+  endBlock: BigInt
+  endBlock_gt: BigInt
+  endBlock_gte: BigInt
+  endBlock_in: [BigInt!]
+  endBlock_lt: BigInt
+  endBlock_lte: BigInt
+  endBlock_not: BigInt
+  endBlock_not_in: [BigInt!]
+  executionTime: BigInt
+  executionTime_gt: BigInt
+  executionTime_gte: BigInt
+  executionTime_in: [BigInt!]
+  executionTime_lt: BigInt
+  executionTime_lte: BigInt
+  executionTime_not: BigInt
+  executionTime_not_in: [BigInt!]
+  executor: String
+  executor_contains: String
+  executor_ends_with: String
+  executor_gt: String
+  executor_gte: String
+  executor_in: [String!]
+  executor_lt: String
+  executor_lte: String
+  executor_not: String
+  executor_not_contains: String
+  executor_not_ends_with: String
+  executor_not_in: [String!]
+  executor_not_starts_with: String
+  executor_starts_with: String
+  govContract: Bytes
+  govContract_contains: Bytes
+  govContract_in: [Bytes!]
+  govContract_not: Bytes
+  govContract_not_contains: Bytes
+  govContract_not_in: [Bytes!]
+  governanceStrategy: Bytes
+  governanceStrategy_contains: Bytes
+  governanceStrategy_in: [Bytes!]
+  governanceStrategy_not: Bytes
+  governanceStrategy_not_contains: Bytes
+  governanceStrategy_not_in: [Bytes!]
+  id: ID
+  id_gt: ID
+  id_gte: ID
+  id_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_not: ID
+  id_not_in: [ID!]
+  initiatorExecution: Bytes
+  initiatorExecution_contains: Bytes
+  initiatorExecution_in: [Bytes!]
+  initiatorExecution_not: Bytes
+  initiatorExecution_not_contains: Bytes
+  initiatorExecution_not_in: [Bytes!]
+  initiatorQueueing: Bytes
+  initiatorQueueing_contains: Bytes
+  initiatorQueueing_in: [Bytes!]
+  initiatorQueueing_not: Bytes
+  initiatorQueueing_not_contains: Bytes
+  initiatorQueueing_not_in: [Bytes!]
+  ipfsHash: String
+  ipfsHash_contains: String
+  ipfsHash_ends_with: String
+  ipfsHash_gt: String
+  ipfsHash_gte: String
+  ipfsHash_in: [String!]
+  ipfsHash_lt: String
+  ipfsHash_lte: String
+  ipfsHash_not: String
+  ipfsHash_not_contains: String
+  ipfsHash_not_ends_with: String
+  ipfsHash_not_in: [String!]
+  ipfsHash_not_starts_with: String
+  ipfsHash_starts_with: String
+  lastUpdateBlock: BigInt
+  lastUpdateBlock_gt: BigInt
+  lastUpdateBlock_gte: BigInt
+  lastUpdateBlock_in: [BigInt!]
+  lastUpdateBlock_lt: BigInt
+  lastUpdateBlock_lte: BigInt
+  lastUpdateBlock_not: BigInt
+  lastUpdateBlock_not_in: [BigInt!]
+  lastUpdateTimestamp: Int
+  lastUpdateTimestamp_gt: Int
+  lastUpdateTimestamp_gte: Int
+  lastUpdateTimestamp_in: [Int!]
+  lastUpdateTimestamp_lt: Int
+  lastUpdateTimestamp_lte: Int
+  lastUpdateTimestamp_not: Int
+  lastUpdateTimestamp_not_in: [Int!]
+  shortDescription: String
+  shortDescription_contains: String
+  shortDescription_ends_with: String
+  shortDescription_gt: String
+  shortDescription_gte: String
+  shortDescription_in: [String!]
+  shortDescription_lt: String
+  shortDescription_lte: String
+  shortDescription_not: String
+  shortDescription_not_contains: String
+  shortDescription_not_ends_with: String
+  shortDescription_not_in: [String!]
+  shortDescription_not_starts_with: String
+  shortDescription_starts_with: String
+  signatures: [String!]
+  signatures_contains: [String!]
+  signatures_not: [String!]
+  signatures_not_contains: [String!]
+  startBlock: BigInt
+  startBlock_gt: BigInt
+  startBlock_gte: BigInt
+  startBlock_in: [BigInt!]
+  startBlock_lt: BigInt
+  startBlock_lte: BigInt
+  startBlock_not: BigInt
+  startBlock_not_in: [BigInt!]
+  state: ProposalState
+  state_not: ProposalState
+  targets: [Bytes!]
+  targets_contains: [Bytes!]
+  targets_not: [Bytes!]
+  targets_not_contains: [Bytes!]
+  title: String
+  title_contains: String
+  title_ends_with: String
+  title_gt: String
+  title_gte: String
+  title_in: [String!]
+  title_lt: String
+  title_lte: String
+  title_not: String
+  title_not_contains: String
+  title_not_ends_with: String
+  title_not_in: [String!]
+  title_not_starts_with: String
+  title_starts_with: String
+  totalCurrentVoters: Int
+  totalCurrentVoters_gt: Int
+  totalCurrentVoters_gte: Int
+  totalCurrentVoters_in: [Int!]
+  totalCurrentVoters_lt: Int
+  totalCurrentVoters_lte: Int
+  totalCurrentVoters_not: Int
+  totalCurrentVoters_not_in: [Int!]
+  totalPropositionSupply: BigInt
+  totalPropositionSupply_gt: BigInt
+  totalPropositionSupply_gte: BigInt
+  totalPropositionSupply_in: [BigInt!]
+  totalPropositionSupply_lt: BigInt
+  totalPropositionSupply_lte: BigInt
+  totalPropositionSupply_not: BigInt
+  totalPropositionSupply_not_in: [BigInt!]
+  totalVotingSupply: BigInt
+  totalVotingSupply_gt: BigInt
+  totalVotingSupply_gte: BigInt
+  totalVotingSupply_in: [BigInt!]
+  totalVotingSupply_lt: BigInt
+  totalVotingSupply_lte: BigInt
+  totalVotingSupply_not: BigInt
+  totalVotingSupply_not_in: [BigInt!]
+  values: [BigInt!]
+  values_contains: [BigInt!]
+  values_not: [BigInt!]
+  values_not_contains: [BigInt!]
+  winner: Winner
+  winner_not: Winner
+  withDelegatecalls: [Boolean!]
+  withDelegatecalls_contains: [Boolean!]
+  withDelegatecalls_not: [Boolean!]
+  withDelegatecalls_not_contains: [Boolean!]
+}
+
+enum Proposal_orderBy {
+  aipNumber
+  author
+  calldatas
+  createdBlockNumber
+  createdTimestamp
+  creator
+  currentNoVote
+  currentYesVote
+  discussions
+  endBlock
+  executionTime
+  executor
+  govContract
+  governanceStrategy
+  id
+  initiatorExecution
+  initiatorQueueing
+  ipfsHash
+  lastUpdateBlock
+  lastUpdateTimestamp
+  shortDescription
+  signatures
+  startBlock
+  state
+  targets
+  title
+  totalCurrentVoters
+  totalPropositionSupply
+  totalVotingSupply
+  values
+  votes
+  winner
+  withDelegatecalls
+}
+
+type Query {
+  """Access to subgraph metadata"""
+  _meta(block: Block_height): _Meta_
+  executor(
+    """
+    The block at which the query should be executed. Can either be an `{ number: Int }` containing the block number or a `{ hash: Bytes }` value containing a block hash. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    id: ID!
+  ): Executor
+  executors(
+    """
+    The block at which the query should be executed. Can either be an `{ number: Int }` containing the block number or a `{ hash: Bytes }` value containing a block hash. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    first: Int = 100
+    orderBy: Executor_orderBy
+    orderDirection: OrderDirection
+    skip: Int = 0
+    where: Executor_filter
+  ): [Executor!]!
+  proposal(
+    """
+    The block at which the query should be executed. Can either be an `{ number: Int }` containing the block number or a `{ hash: Bytes }` value containing a block hash. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    id: ID!
+  ): Proposal
+  proposals(
+    """
+    The block at which the query should be executed. Can either be an `{ number: Int }` containing the block number or a `{ hash: Bytes }` value containing a block hash. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    first: Int = 100
+    orderBy: Proposal_orderBy
+    orderDirection: OrderDirection
+    skip: Int = 0
+    where: Proposal_filter
+  ): [Proposal!]!
+  vote(
+    """
+    The block at which the query should be executed. Can either be an `{ number: Int }` containing the block number or a `{ hash: Bytes }` value containing a block hash. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    id: ID!
+  ): Vote
+  votes(
+    """
+    The block at which the query should be executed. Can either be an `{ number: Int }` containing the block number or a `{ hash: Bytes }` value containing a block hash. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    first: Int = 100
+    orderBy: Vote_orderBy
+    orderDirection: OrderDirection
+    skip: Int = 0
+    where: Vote_filter
+  ): [Vote!]!
+}
+
+type Subscription {
+  """Access to subgraph metadata"""
+  _meta(block: Block_height): _Meta_
+  executor(
+    """
+    The block at which the query should be executed. Can either be an `{ number: Int }` containing the block number or a `{ hash: Bytes }` value containing a block hash. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    id: ID!
+  ): Executor
+  executors(
+    """
+    The block at which the query should be executed. Can either be an `{ number: Int }` containing the block number or a `{ hash: Bytes }` value containing a block hash. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    first: Int = 100
+    orderBy: Executor_orderBy
+    orderDirection: OrderDirection
+    skip: Int = 0
+    where: Executor_filter
+  ): [Executor!]!
+  proposal(
+    """
+    The block at which the query should be executed. Can either be an `{ number: Int }` containing the block number or a `{ hash: Bytes }` value containing a block hash. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    id: ID!
+  ): Proposal
+  proposals(
+    """
+    The block at which the query should be executed. Can either be an `{ number: Int }` containing the block number or a `{ hash: Bytes }` value containing a block hash. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    first: Int = 100
+    orderBy: Proposal_orderBy
+    orderDirection: OrderDirection
+    skip: Int = 0
+    where: Proposal_filter
+  ): [Proposal!]!
+  vote(
+    """
+    The block at which the query should be executed. Can either be an `{ number: Int }` containing the block number or a `{ hash: Bytes }` value containing a block hash. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    id: ID!
+  ): Vote
+  votes(
+    """
+    The block at which the query should be executed. Can either be an `{ number: Int }` containing the block number or a `{ hash: Bytes }` value containing a block hash. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    first: Int = 100
+    orderBy: Vote_orderBy
+    orderDirection: OrderDirection
+    skip: Int = 0
+    where: Vote_filter
+  ): [Vote!]!
+}
+
+type Vote {
+  """
+  voter:proposalid
+  
+  """
+  id: ID!
+  proposal: Proposal!
+  support: Boolean!
+  timestamp: Int!
+  voter: Bytes!
+  votingPower: BigInt!
+}
+
+input Vote_filter {
+  id: ID
+  id_gt: ID
+  id_gte: ID
+  id_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_not: ID
+  id_not_in: [ID!]
+  proposal: String
+  proposal_contains: String
+  proposal_ends_with: String
+  proposal_gt: String
+  proposal_gte: String
+  proposal_in: [String!]
+  proposal_lt: String
+  proposal_lte: String
+  proposal_not: String
+  proposal_not_contains: String
+  proposal_not_ends_with: String
+  proposal_not_in: [String!]
+  proposal_not_starts_with: String
+  proposal_starts_with: String
+  support: Boolean
+  support_in: [Boolean!]
+  support_not: Boolean
+  support_not_in: [Boolean!]
+  timestamp: Int
+  timestamp_gt: Int
+  timestamp_gte: Int
+  timestamp_in: [Int!]
+  timestamp_lt: Int
+  timestamp_lte: Int
+  timestamp_not: Int
+  timestamp_not_in: [Int!]
+  voter: Bytes
+  voter_contains: Bytes
+  voter_in: [Bytes!]
+  voter_not: Bytes
+  voter_not_contains: Bytes
+  voter_not_in: [Bytes!]
+  votingPower: BigInt
+  votingPower_gt: BigInt
+  votingPower_gte: BigInt
+  votingPower_in: [BigInt!]
+  votingPower_lt: BigInt
+  votingPower_lte: BigInt
+  votingPower_not: BigInt
+  votingPower_not_in: [BigInt!]
+}
+
+enum Vote_orderBy {
+  id
+  proposal
+  support
+  timestamp
+  voter
+  votingPower
+}
+
+enum Winner {
+  Abstain
+  Na
+  No
+  Yes
+}
+
+type _Block_ {
+  """The hash of the block"""
+  hash: Bytes
+
+  """The block number"""
+  number: Int!
+}
+
+"""The type for the top-level _meta field"""
+type _Meta_ {
+  """
+  Information about a specific subgraph block. The hash of the block
+  will be null if the _meta field has a block constraint that asks for
+  a block number. It will be filled if the _meta field has no block constraint
+  and therefore asks for the latest  block
+  
+  """
+  block: _Block_!
+
+  """The deployment ID"""
+  deployment: String!
+
+  """If `true`, the subgraph encountered indexing errors at some past block"""
+  hasIndexingErrors: Boolean!
+}
+
+enum _SubgraphErrorPolicy_ {
+  """Data will be returned even if the subgraph has indexing errors"""
+  allow
+
+  """
+  If the subgraph has indexing errors, data will be omitted. The default.
+  """
+  deny
+}
